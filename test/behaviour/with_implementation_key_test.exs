@@ -32,6 +32,10 @@ defmodule Behaviour.WithImplementationKeyTest do
     verify!(SomeBehaviourMock)
   end
 
+  test "defines a __knigge__(:behaviour) function" do
+    assert SomeBehaviour.__knigge__(:behaviour) == SomeBehaviour
+  end
+
   test "defines a __knigge__(:implementation) function" do
     assert SomeBehaviour.__knigge__(:implementation) == SomeBehaviourMock
   end

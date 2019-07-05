@@ -18,4 +18,8 @@ defmodule Behaviour.WithAnExternalBehaviour do
   test "calling TheFacade.__knigge__(:behaviour) returns TheBehaviour" do
     assert TheFacade.__knigge__(:behaviour) == TheBehaviour
   end
+
+  test "calling TheFacade.__knigge__(:implementation) returns TheImplementation" do
+    assert TheFacade.__knigge__(:implementation) == TheImplementation
+  end
 end
