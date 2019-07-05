@@ -1,4 +1,6 @@
 defmodule Knigge do
+  @type key :: :implementation
+
   defmacro __using__(opts) do
     Knigge.Options.validate!(opts)
 
@@ -8,6 +10,8 @@ defmodule Knigge do
       use Knigge.Implementation, unquote(opts)
       use Knigge.Delegation, unquote(opts)
 
+      @doc "Access Knigge internal values, such as the implementation being delegated to etc."
+      @spec __knigge__(key :: Knigge.key()) :: any()
       def __knigge__(key), do: Keyword.fetch!(@__knigge__, key)
     end
   end
