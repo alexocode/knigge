@@ -21,4 +21,24 @@ defmodule Behaviour.WithOtpAppKey do
 
     assert WorkingBehaviour.__knigge__(:implementation) == SomeModule
   end
+
+  test "calling my_function/1 delegates the call to the implementation" do
+    Application.put_env(:knigge, __MODULE__.AGreatBehaviour, AGreatBehaviourMock)
+
+    # Should not raise
+    defmodule AGreatBehaviour do
+      use Knigge, otp_app: :knigge
+
+      @callback my_function(arg :: any()) :: no_return
+    end
+
+    Mox.defmock(AGreatBehaviourMock, for: AGreatBehaviour)
+    Mox.expect(AGreatBehaviourMock, :my_function, fn arg -> send self(), {:argument, arg} end)
+
+    AGreatBehaviour.my_function("with some argument")
+
+    assert_receive {:argument, "with some argument"}
+
+    Mox.verify!(AGreatBehaviourMock)
+  end
 end
