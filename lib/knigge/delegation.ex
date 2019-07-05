@@ -1,14 +1,12 @@
-# TODO: Rename to be more KNIGGE
-defmodule Knigge.Generator do
-  defmacro __using__(implementation: implementation) do
+defmodule Knigge.Delegation do
+  defmacro __using__(_opts) do
     quote do
-      @implementation unquote(implementation)
       @before_compile unquote(__MODULE__)
     end
   end
 
   defmacro __before_compile__(%{module: module}) do
-    delegate = Module.get_attribute(module, :implementation)
+    delegate = Module.get_attribute(module, :__knigge__)[:implementation]
 
     module
     |> Module.get_attribute(:callback)
