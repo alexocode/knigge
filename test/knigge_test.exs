@@ -20,5 +20,16 @@ defmodule KniggeTest do
       assert Knigge.fetch!(MyModuleUsingKnigge, :behaviour) == MyModuleUsingKnigge
       assert Knigge.fetch!(MyModuleUsingKnigge, :implementation) == Something
     end
+
+    test "with a module using Knigge being open" do
+      defmodule MyOpenModuleUsingKnigge do
+        use Knigge, implementation: Something
+
+        @callback my_function() :: no_return
+
+        assert Knigge.fetch!(__MODULE__, :behaviour) == __MODULE__
+        assert Knigge.fetch!(__MODULE__, :implementation) == Something
+      end
+    end
   end
 end
