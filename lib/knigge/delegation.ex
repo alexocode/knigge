@@ -6,27 +6,31 @@ defmodule Knigge.Delegation do
   end
 
   defmacro __before_compile__(%{module: module}) do
-    delegate = Module.get_attribute(module, :__knigge__)[:implementation]
+    delegate = get_delegate(module)
+    _definitions = get_definitions(module)
 
     module
     |> Module.get_attribute(:callback)
-    |> Enum.map(&callback_to_defdelegate(&1, from: module, to: delegate))
+    |> Enum.map(fn callback ->
+      callback_to_defdelegate(callback, from: module, to: delegate)
+    end)
   end
 
-  def callback_to_defdelegate(
-        {
-          :callback,
-          {
-            :"::",
-            _,
-            [{name, _, typespeced_args}, _return]
-          },
-          _module
-        },
-        from: module,
-        to: delegate
-      ) do
-    args = Macro.generate_arguments(length(typespeced_args), module)
+  defp get_delegate(module) do
+    module
+    |> Module.get_attribute(:__knigge__)
+    |> Keyword.fetch!(:implementation)
+  end
+
+  defp get_definitions(module) do
+    module
+    |> Module.definitions_in()
+    |> Map.new()
+  end
+
+  def callback_to_defdelegate(callback, from: module, to: delegate) do
+    {name, arity} = Knigge.AST.function_spec_from_callback(callback)
+    args = Macro.generate_arguments(arity, module)
 
     quote do
       defdelegate unquote(name)(unquote_splicing(args)), to: unquote(delegate)
