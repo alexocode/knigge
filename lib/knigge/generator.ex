@@ -1,5 +1,20 @@
 # TODO: Rename to be more KNIGGE
 defmodule Knigge.Generator do
+  defmacro __using__(implementation: implementation) do
+    quote do
+      @implementation unquote(implementation)
+      @before_compile unquote(__MODULE__)
+    end
+  end
+
+  defmacro __before_compile__(%{module: module}) do
+    delegate = Module.get_attribute(module, :implementation)
+
+    module
+    |> Module.get_attribute(:callback)
+    |> Enum.map(&callback_to_defdelegate(&1, from: module, to: delegate))
+  end
+
   def callback_to_defdelegate(
         {
           :callback,
