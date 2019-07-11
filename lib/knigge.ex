@@ -1,4 +1,60 @@
 defmodule Knigge do
+  @moduledoc """
+  `Knigge` offers an opinionated way of dealing with elixir behaviours.
+
+  Opinionated means that it offers an easy way of defining a "facade" for a
+  behaviour which then delegates calls to the real implementation, which is
+  either given directly to `Knigge` or fetched from the configuration.
+
+  `Knigge` can either be used directly in a behaviour or in separate module by
+  passing the behaviour which should be "facaded" as an option to `Knigge`.
+
+  ## Examples
+
+  Imagine a behaviour looking like this:
+
+      defmodule MyGreatBehaviour do
+        @callback my_great_callback(my_argument :: any()) :: any()
+      end
+
+  Now imagine you want to delegate calls to this behaviour like this:
+
+      defmodule MyGreatBehaviourFacade do
+        @behaviour MyGreatBehaviour
+
+        @implementation Application.get_env(:my_application, MyGreatBehaviour)
+
+        defdelegate my_great_callback, to: @implementation
+      end
+
+  With this in place you can simply reference the "real implementation" by
+  calling functions on your facade:
+
+      MyGreatBehaviourFacade.my_great_callback(:with_some_argument)
+
+  `Knigge` allows you to reduce this boilerplate to the absolute minimum:
+
+      defmodule MyGreatBehaviourFacade do
+        use Knigge,
+          behaviour: MyGreatBehaviour,
+          otp_app: :my_application
+      end
+
+  Under the hood this compiles down to the explicit delegation visible on the top.
+  In case you don't want to fetch your implementation from the configuration,
+  `Knigge` also allows you to explicitely pass the implementation of the
+  behaviour with the aptly named key `implementation`:
+
+      defmodule MyGreatBehaviourFacade do
+        use Knigge,
+          behaviour: MyGreatBehaviour,
+          implementation: MyGreatImplementation
+      end
+
+  `Knigge` expects either the `otp_app` key or the `implementation` key. If
+  neither is provided an error will be raised at compile time.
+  """
+
   @type key :: :behaviour | :implementation | :opts
 
   defmacro __using__(opts) do
