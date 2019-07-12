@@ -51,8 +51,12 @@ defmodule Knigge do
           implementation: MyGreatImplementation
       end
 
+  ## Options
+
   `Knigge` expects either the `otp_app` key or the `implementation` key. If
   neither is provided an error will be raised at compile time.
+
+  For further information check the `Knigge.Options` module.
   """
 
   @type key :: :behaviour | :implementation | :options
