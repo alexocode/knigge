@@ -42,13 +42,16 @@ defmodule Knigge.Options do
       ** (ArgumentError) Knigge expects a keyword list as options, instead received: [1, 2, 3]
 
       iex> Knigge.Options.validate!([])
-      ** (ArgumentError) Knigge expects either an :implementation or :otp_app key but neither was given.
+      ** (ArgumentError) Knigge expects either the :implementation or the :otp_app option but neither was given.
 
       iex> Knigge.Options.validate!(implementation: SomeModule)
       [implementation: SomeModule]
 
       iex> Knigge.Options.validate!(otp_app: :knigge)
       [otp_app: :knigge]
+
+      iex> Knigge.Options.validate!(implementation: SomeModule, otp_app: :knigge)
+      ** (ArgumentError) Knigge expects either the :implementation or the :otp_app option but both were given.
 
       iex> Knigge.Options.validate!(otp_app: :knigge, the_answer_to_everything: 42, another_weird_option: 1337)
       ** (ArgumentError) Knigge received unexpected options: [the_answer_to_everything: 42, another_weird_option: 1337]
@@ -72,12 +75,18 @@ defmodule Knigge.Options do
   end
 
   defp validate_required!(opts) do
-    unless has_key?(opts, :implementation) or has_key?(opts, :otp_app) do
-      raise ArgumentError,
-            "Knigge expects either an :implementation or :otp_app key but neither was given."
-    end
+    case {has_key?(opts, :implementation), has_key?(opts, :otp_app)} do
+      {false, false} ->
+        raise ArgumentError,
+              "Knigge expects either the :implementation or the :otp_app option but neither was given."
 
-    :ok
+      {true, true} ->
+        raise ArgumentError,
+              "Knigge expects either the :implementation or the :otp_app option but both were given."
+
+      _ ->
+        :ok
+    end
   end
 
   defp validate_known!(opts) do
