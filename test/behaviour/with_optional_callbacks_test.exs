@@ -11,7 +11,9 @@ defmodule Behaviour.WithOptionalCallbacksTest do
 
       behaviour =
         defmodule_salted Behaviour do
-          use Knigge, implementation: implementation
+          use Knigge,
+            implementation: implementation,
+            check_if_exists?: false
 
           @callback my_required_function() :: no_return
           @callback my_optional_function() :: no_return
@@ -88,7 +90,7 @@ defmodule Behaviour.WithOptionalCallbacksTest do
     %{behaviour: behaviour, facade: facade, implementation: implementation} =
       define_facade do
         defdefault my_optional_function do
-          send self(), {__MODULE__, :my_optional, []}
+          send self(), {__MODULE__, :my_optional_function, []}
 
           :my_great_default
         end
@@ -108,7 +110,7 @@ defmodule Behaviour.WithOptionalCallbacksTest do
     Mox.expect(implementation, :my_optional_function, fn -> :my_great_implementation end)
 
     assert :my_great_implementation == facade.my_optional_function()
-    refute_receive {^facade, :my_optional, []}
+    refute_receive {^facade, :my_optional_function, []}
 
     Mox.verify!(implementation)
 

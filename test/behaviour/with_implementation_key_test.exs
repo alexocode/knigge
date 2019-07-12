@@ -4,7 +4,9 @@ defmodule Behaviour.WithImplementationKeyTest do
   import Mox
 
   defmodule SomeBehaviour do
-    use Knigge, implementation: SomeBehaviourMock
+    use Knigge,
+      implementation: SomeBehaviourMock,
+      check_if_exists?: false
 
     @callback my_function(argument :: any()) :: any()
     @callback another_function(list()) :: list()

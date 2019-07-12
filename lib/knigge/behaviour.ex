@@ -10,8 +10,6 @@ defmodule Knigge.Behaviour do
   Keyword list.
   """
 
-  alias Knigge.Error
-
   def fetch!(module, opts) do
     opts
     |> Keyword.get(:behaviour, module)
@@ -19,8 +17,8 @@ defmodule Knigge.Behaviour do
   end
 
   defp ensure_exists!(module, opts) do
-    unless Code.ensure_loaded?(module) do
-      Error.behaviour_not_loaded!(module, opts[:env])
+    unless Knigge.Module.exists?(module, opts) do
+      Knigge.Error.behaviour_not_loaded!(module, opts[:env])
     end
 
     module

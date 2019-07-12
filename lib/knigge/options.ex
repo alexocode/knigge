@@ -106,10 +106,13 @@ defmodule Knigge.Options do
   defp known_option?(name) do
     name in [
       :behaviour,
+      :check_if_exists?,
       :do_not_delegate,
       :implementation,
       :otp_app,
       :warn
     ]
   end
+
+  def check_if_exists?(opts), do: Keyword.get(opts, :check_if_exists?, true)
 end

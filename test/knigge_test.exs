@@ -12,7 +12,9 @@ defmodule KniggeTest do
 
     test "with a module using Knigge" do
       defmodule MyModuleUsingKnigge do
-        use Knigge, implementation: Something
+        use Knigge,
+          implementation: Something,
+          check_if_exists?: false
 
         @callback my_function() :: no_return
       end
@@ -23,7 +25,9 @@ defmodule KniggeTest do
 
     test "with a module using Knigge being open" do
       defmodule MyOpenModuleUsingKnigge do
-        use Knigge, implementation: Something
+        use Knigge,
+          implementation: Something,
+          check_if_exists?: false
 
         @callback my_function() :: no_return
 
