@@ -1,7 +1,6 @@
 defmodule Behaviour.WithAlreadyExistingImplementationTest do
   use ExUnit.Case, async: true
 
-  import ExUnit.CaptureLog
   import ExUnit.CaptureIO
   import Knigge.Test.SaltedModule
 
@@ -13,27 +12,17 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
     options = Keyword.put(knigge_options, :implementation, implementation)
 
     quote bind_quoted: [behaviour: behaviour, implementation: implementation], unquote: true do
-      logs =
-        capture_log(fn ->
-          warnings =
-            capture_io(:stderr, fn ->
-              defmodule behaviour do
-                use Knigge, unquote(options)
-
-                @callback my_function_with_default() :: :ok
-                @callback my_other_function() :: :ok
-
-                def my_function_with_default, do: :ok
-              end
-            end)
-
-          send self(), {:warnings, warnings}
-        end)
-
       warnings =
-        receive do
-          {:warnings, warnings} -> warnings
-        end
+        capture_io(:stderr, fn ->
+          defmodule behaviour do
+            use Knigge, unquote(options)
+
+            @callback my_function_with_default() :: :ok
+            @callback my_other_function() :: :ok
+
+            def my_function_with_default, do: :ok
+          end
+        end)
 
       Mox.defmock(implementation, for: behaviour)
 
@@ -41,7 +30,6 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
         facade: behaviour,
         behaviour: behaviour,
         implementation: implementation,
-        logs: logs,
         warnings: warnings
       }
     end
@@ -54,27 +42,25 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
              ~r"this clause cannot match because a previous clause at line \d+ always matches"
   end
 
-  test "logs a Knigge warning for an already existing clause because Knigge doesn't know what to do about it" do
-    %{facade: facade, logs: logs} = define_facade()
+  test "prints a Knigge warning for an already existing clause because Knigge doesn't know what to do about it" do
+    %{facade: facade, warnings: warnings} = define_facade()
 
-    assert logs =~ """
-           Knigge encountered definition `#{facade}.my_function_with_default/0` which matches callback `my_function_with_default/0`.
-
-           It will not delegate this callback! If this is your intention you can tell Knigge to ignore this callback:
-
-               use Knigge, do_not_delegate: [my_function_with_default: 0]
+    assert warnings =~ """
+           Knigge encountered definition `#{facade}.my_function_with_default/0` which matches callback `my_function_with_default/0`. It will not delegate this callback!
+                    If this is your intention you can tell Knigge to ignore this callback:
+                      use Knigge, do_not_delegate: [my_function_with_default: 0]
            """
   end
 
-  test "does not log a Knigge warning for an already existing clause when `do_not_delegate` is provided for the definition" do
-    %{logs: logs} = define_facade(do_not_delegate: [my_function_with_default: 0])
+  test "does not print a Knigge warning for an already existing clause when `do_not_delegate` is provided for the definition" do
+    %{warnings: warnings} = define_facade(do_not_delegate: [my_function_with_default: 0])
 
-    assert logs == ""
+    assert warnings == ""
   end
 
-  test "does not log a Knigge warning for an already existing clause when `warn` is `false`" do
-    %{logs: logs} = define_facade(warn: false)
+  test "does not print a Knigge warning for an already existing clause when `warn` is `false`" do
+    %{warnings: warnings} = define_facade(warn: false)
 
-    assert logs == ""
+    assert warnings == ""
   end
 end

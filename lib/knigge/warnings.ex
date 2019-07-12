@@ -9,22 +9,27 @@ defmodule Knigge.Warnings do
       |> Knigge.fetch!(:options)
       |> Keyword.get(:warn, true)
       |> if do
-        Logger.warn(unquote(message))
+        unquote(message)
+        |> Knigge.Warnings.sanitze()
+        |> IO.warn(Macro.Env.stacktrace(__ENV__))
       end
     end
   end
 
   def definition_matching_callback(module, {name, arity}) do
-    warn(module, fn ->
-      function = "#{name}/#{arity}"
+    function = "#{name}/#{arity}"
 
-      """
-      Knigge encountered definition `#{module}.#{function}` which matches callback `#{function}`.
+    warn(module, """
+    Knigge encountered definition `#{module}.#{function}` which matches callback `#{function}`. It will not delegate this callback!
+    If this is your intention you can tell Knigge to ignore this callback:
+      use Knigge, do_not_delegate: [#{name}: #{arity}]
+    """)
+  end
 
-      It will not delegate this callback! If this is your intention you can tell Knigge to ignore this callback:
-
-          use Knigge, do_not_delegate: [#{name}: #{arity}]
-      """
-    end)
+  def sanitze(message) do
+    message
+    |> String.split("\n")
+    # Indent by 9 spaces to line them up with the "warning: " label
+    |> Enum.join("\n         ")
   end
 end
