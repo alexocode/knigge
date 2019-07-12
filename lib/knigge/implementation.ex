@@ -9,7 +9,7 @@ defmodule Knigge.Implementation do
     |> ensure_exists!(opts)
   end
 
-  defp from_env!(app, behaviour), do: Application.fetch_env!(app, behaviour)
+  defp from_env!(app, module), do: Application.fetch_env!(app, module)
 
   defp ensure_exists!(module, opts) do
     unless Knigge.Module.exists?(module, opts) do

@@ -22,7 +22,7 @@ defmodule Knigge do
       defmodule MyGreatBehaviourFacade do
         @behaviour MyGreatBehaviour
 
-        @implementation Application.get_env(:my_application, MyGreatBehaviour)
+        @implementation Application.get_env(:my_application, MyGreatBehaviourFacade)
 
         defdelegate my_great_callback, to: @implementation
       end
