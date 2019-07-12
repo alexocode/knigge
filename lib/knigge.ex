@@ -55,24 +55,24 @@ defmodule Knigge do
   neither is provided an error will be raised at compile time.
   """
 
-  @type key :: :behaviour | :implementation | :opts
+  @type key :: :behaviour | :implementation | :options
 
-  defmacro __using__(opts) do
-    Knigge.Options.validate!(opts)
+  defmacro __using__(options) do
+    Knigge.Options.validate!(options)
 
     quote do
       @before_compile Knigge.Delegation
 
       @__knigge__ [
-        opts: unquote(opts),
-        behaviour: Knigge.Behaviour.fetch!(__MODULE__, unquote(opts)),
-        implementation: Knigge.Implementation.fetch!(__MODULE__, unquote(opts))
+        behaviour: Knigge.Behaviour.fetch!(__MODULE__, unquote(options)),
+        implementation: Knigge.Implementation.fetch!(__MODULE__, unquote(options)),
+        options: unquote(options)
       ]
 
       @doc "Access Knigge internal values, such as the implementation being delegated to etc."
       @spec __knigge__(:behaviour) :: module()
       @spec __knigge__(:implementation) :: module()
-      @spec __knigge__(:opts) :: Knigge.Options.t()
+      @spec __knigge__(:options) :: Knigge.Options.t()
       def __knigge__(key), do: Keyword.fetch!(@__knigge__, key)
     end
   end
@@ -80,7 +80,7 @@ defmodule Knigge do
   @doc "Access Knigge internal values, such as the implementation being delegated to etc."
   @spec fetch!(module(), :behaviour) :: module()
   @spec fetch!(module(), :implementation) :: module()
-  @spec fetch!(module(), :opts) :: Knigge.Options.t()
+  @spec fetch!(module(), :options) :: Knigge.Options.t()
   def fetch!(module, key) do
     cond do
       Module.open?(module) ->
