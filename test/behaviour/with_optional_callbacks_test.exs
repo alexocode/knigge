@@ -17,7 +17,7 @@ defmodule Behaviour.WithOptionalCallbacksTest do
           @callback my_optional_function() :: no_return
           @callback my_optional_function_with_arguments(any(), any()) :: no_return
 
-          @optional_callbacks [my_optional_function: 0, my_optional_function_with_arguments: 2]
+          @optional_callbacks my_optional_function: 0, my_optional_function_with_arguments: 2
 
           unquote(block)
         end
@@ -47,6 +47,16 @@ defmodule Behaviour.WithOptionalCallbacksTest do
     assert_raise UndefinedFunctionError,
                  "function #{inspect(implementation)}.my_optional_function/0 is undefined or private",
                  fn -> facade.my_optional_function() end
+  end
+
+  test "raises a CompileError when a default is being defined for a required callback" do
+    assert_raise CompileError,
+                 ~r/you can not define a default implementation for a non-optional callback, as it will never be invoked\./,
+                 fn ->
+                   define_facade do
+                     defdefault(my_required_function, do: :this_should_raise)
+                   end
+                 end
   end
 
   test "invokes the default when the implementation does not implement the optional callback" do

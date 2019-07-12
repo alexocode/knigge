@@ -30,7 +30,10 @@ defmodule Knigge.Behaviour do
 
   def optional_callbacks(module) do
     if Module.open?(module) do
-      Module.get_attribute(module, :optional_callbacks) || []
+      module
+      |> Module.get_attribute(:optional_callbacks)
+      |> List.wrap()
+      |> List.flatten()
     else
       module.behaviour_info(:optional_callbacks)
     end

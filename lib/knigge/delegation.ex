@@ -21,13 +21,13 @@ defmodule Knigge.Delegation do
     end
   end
 
-  defmacro __before_compile__(%{module: module}) do
-    generate(module)
+  defmacro __before_compile__(%{module: module} = env) do
+    generate(module, env)
   end
 
-  def generate(module) do
+  def generate(module, env) do
     callbacks = get_callbacks(module)
-    _optional_callbacks = get_optional_callbacks(module)
+    optional_callbacks = get_optional_callbacks(module)
     do_not_delegate = get_do_not_delegate_option(module)
     definitions = get_definitions(module)
     implementation = get_implementation(module)
@@ -42,13 +42,15 @@ defmodule Knigge.Delegation do
           Warn.definition_matching_callback(module, callback)
 
         Map.has_key?(defaults, callback) ->
-          # unless callback in optional_callbacks do
-          #   raise ArgumentError
-          # end
+          unless callback in optional_callbacks do
+            raise CompileError,
+              description:
+                "you can not define a default implementation for a non-optional callback, as it will never be invoked.",
+              file: env.file,
+              line: env.line
+          end
 
-          default = Map.get(defaults, callback)
-
-          callback_to_defdefault(callback, to: implementation, default: default)
+          callback_to_defdefault(callback, to: implementation, default: defaults[callback])
 
         true ->
           callback_to_defdelegate(callback, to: implementation)
