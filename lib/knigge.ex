@@ -63,15 +63,18 @@ defmodule Knigge do
 
   @spec __using__(Knigge.Options.t()) :: no_return
   defmacro __using__(options) do
-    Knigge.Options.validate!(options)
+    quote bind_quoted: [options: options] do
+      Knigge.Options.validate!(options)
 
-    quote do
-      @before_compile Knigge.Delegation
+      use Knigge.Delegation
+
+      behaviour = Knigge.Behaviour.fetch!(__MODULE__, options)
+      implementation = Knigge.Implementation.fetch!(__MODULE__, options)
 
       @__knigge__ [
-        behaviour: Knigge.Behaviour.fetch!(__MODULE__, unquote(options)),
-        implementation: Knigge.Implementation.fetch!(__MODULE__, unquote(options)),
-        options: unquote(options)
+        behaviour: behaviour,
+        implementation: implementation,
+        options: options
       ]
 
       @doc "Access Knigge internal values, such as the implementation being delegated to etc."

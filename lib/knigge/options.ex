@@ -102,5 +102,14 @@ defmodule Knigge.Options do
   end
 
   defp known_option?({name, _}), do: known_option?(name)
-  defp known_option?(name), do: name in [:implementation, :otp_app, :do_not_delegate, :warn]
+
+  defp known_option?(name) do
+    name in [
+      :behaviour,
+      :do_not_delegate,
+      :implementation,
+      :otp_app,
+      :warn
+    ]
+  end
 end
