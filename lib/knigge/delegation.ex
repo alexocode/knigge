@@ -7,7 +7,7 @@ defmodule Knigge.Delegation do
 
       @before_compile unquote(__MODULE__)
 
-      Module.register_attribute(__MODULE__, :__knigge_fallbacks__, accumulate: true)
+      Module.register_attribute(__MODULE__, :__knigge_defaults__, accumulate: true)
     end
   end
 
@@ -17,7 +17,7 @@ defmodule Knigge.Delegation do
     value = {Macro.escape(args), Macro.escape(block)}
 
     quote do
-      @__knigge_fallbacks__ {unquote(key), unquote(value)}
+      @__knigge_defaults__ {unquote(key), unquote(value)}
     end
   end
 
@@ -31,7 +31,7 @@ defmodule Knigge.Delegation do
     do_not_delegate = get_do_not_delegate_option(module)
     definitions = get_definitions(module)
     implementation = get_implementation(module)
-    fallbacks = get_fallbacks(module)
+    defaults = get_defaults(module)
 
     for callback <- callbacks do
       cond do
@@ -41,14 +41,14 @@ defmodule Knigge.Delegation do
         callback in definitions ->
           Warn.definition_matching_callback(module, callback)
 
-        Map.has_key?(fallbacks, callback) ->
+        Map.has_key?(defaults, callback) ->
           # unless callback in optional_callbacks do
           #   raise ArgumentError
           # end
 
-          fallback = Map.get(fallbacks, callback)
+          default = Map.get(defaults, callback)
 
-          callback_to_defdefault(callback, to: implementation, fallback: fallback)
+          callback_to_defdefault(callback, to: implementation, default: default)
 
         true ->
           callback_to_defdelegate(callback, to: implementation)
@@ -78,16 +78,16 @@ defmodule Knigge.Delegation do
     Module.definitions_in(module)
   end
 
-  defp get_fallbacks(module) do
+  defp get_defaults(module) do
     module
-    |> Module.get_attribute(:__knigge_fallbacks__)
+    |> Module.get_attribute(:__knigge_defaults__)
     |> Map.new()
   end
 
   defp callback_to_defdefault(
          {name, arity},
          to: implementation,
-         fallback: {args, block}
+         default: {args, block}
        ) do
     quote do
       def unquote(name)(unquote_splicing(args)) do
