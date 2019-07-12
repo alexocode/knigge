@@ -68,6 +68,7 @@ defmodule Knigge do
 
       use Knigge.Delegation
 
+      options = Keyword.put(options, :env, __ENV__)
       behaviour = Knigge.Behaviour.fetch!(__MODULE__, options)
       implementation = Knigge.Implementation.fetch!(__MODULE__, options)
 
