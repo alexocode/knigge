@@ -89,14 +89,36 @@ defmodule Knigge.Delegation do
          to: implementation,
          default: {args, block}
        ) do
-    quote do
-      def unquote(name)(unquote_splicing(args)) do
-        if function_exported?(unquote(implementation), unquote(name), unquote(arity)) do
-          apply(unquote(implementation), unquote(name), unquote(args))
-        else
-          unquote(block)
+    cond do
+      Module.open?(implementation) ->
+        # The module is being compiled, we need to determine at runtime if delegation can happen
+        quote do
+          def unquote(name)(unquote_splicing(args)) do
+            if function_exported?(unquote(implementation), unquote(name), unquote(arity)) do
+              apply(unquote(implementation), unquote(name), unquote(args))
+            else
+              unquote(block)
+            end
+          end
         end
-      end
+
+      function_exported?(implementation, name, arity) ->
+        # The module is compiled and the function exists, we can simply delegate
+        callback_to_defdelegate({name, arity}, to: implementation)
+
+      true ->
+        # The module is compiled and the function is missing, we can use the default
+        quote do
+          def unquote(name)(unquote_splicing(args)) do
+            unquote(block)
+          end
+        end
+    end
+  end
+
+  defp callback_to_defdelegate({name, _arity}, arguments: args, to: implementation) do
+    quote bind_quoted: [name: name, args: args, implementation: implementation] do
+      defdelegate unquote(name)(unquote_splicing(args)), to: implementation
     end
   end
 

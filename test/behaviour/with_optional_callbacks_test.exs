@@ -5,35 +5,38 @@ defmodule Behaviour.WithOptionalCallbacksTest do
 
   require Mox
 
-  defmacrop define_facade(do: block) do
+  defmacrop define_facade_with_mock(mox_options, do: block) do
     quote do
-      implementation = salt_atom(Implementation)
-
       behaviour =
         defmodule_salted Behaviour do
-          use Knigge,
-            implementation: implementation,
-            check_if_exists?: false
-
           @callback my_required_function() :: no_return
           @callback my_optional_function() :: no_return
           @callback my_optional_function_with_arguments(any(), any()) :: no_return
 
           @optional_callbacks my_optional_function: 0, my_optional_function_with_arguments: 2
+        end
+
+      implementation = defmock_salted(Implementation, [{:for, behaviour} | unquote(mox_options)])
+
+      facade =
+        defmodule_salted Facade do
+          use Knigge,
+            behaviour: behaviour,
+            implementation: implementation
 
           unquote(block)
         end
 
-      %{facade: behaviour, behaviour: behaviour, implementation: implementation}
+      %{facade: facade, behaviour: behaviour, implementation: implementation}
     end
   end
 
-  defp define_facade, do: define_facade(do: :ok)
+  defp define_facade_with_mock(mox_options \\ []),
+    do: define_facade_with_mock(mox_options, do: :ok)
 
   test "does generate delegation for optional callbacks" do
-    %{behaviour: behaviour, facade: facade, implementation: implementation} = define_facade()
+    %{facade: facade, implementation: implementation} = define_facade_with_mock()
 
-    Mox.defmock(implementation, for: behaviour)
     Mox.expect(implementation, :my_optional_function, fn -> :ok end)
 
     facade.my_optional_function()
@@ -42,9 +45,8 @@ defmodule Behaviour.WithOptionalCallbacksTest do
   end
 
   test "does raise an UndefinedFunctionError when the implementation does not implement the optional callback" do
-    %{behaviour: behaviour, facade: facade, implementation: implementation} = define_facade()
-
-    Mox.defmock(implementation, for: behaviour, skip_optional_callbacks: [my_optional_function: 0])
+    %{facade: facade, implementation: implementation} =
+      define_facade_with_mock(skip_optional_callbacks: [my_optional_function: 0])
 
     assert_raise UndefinedFunctionError,
                  "function #{inspect(implementation)}.my_optional_function/0 is undefined or private",
@@ -55,7 +57,7 @@ defmodule Behaviour.WithOptionalCallbacksTest do
     assert_raise CompileError,
                  ~r/you can not define a default implementation for a required callback, as it will never be invoked\./,
                  fn ->
-                   define_facade do
+                   define_facade_with_mock [] do
                      defdefault(my_required_function, do: :this_should_raise)
                    end
                  end
@@ -63,7 +65,10 @@ defmodule Behaviour.WithOptionalCallbacksTest do
 
   test "invokes the default when the implementation does not implement the optional callback" do
     %{facade: facade} =
-      define_facade do
+      define_facade_with_mock skip_optional_callbacks: [
+                                my_optional_function: 0,
+                                my_optional_function_with_arguments: 2
+                              ] do
         defdefault my_optional_function do
           send self(), {__MODULE__, :my_optional_function, []}
 
@@ -87,8 +92,8 @@ defmodule Behaviour.WithOptionalCallbacksTest do
   end
 
   test "does not invoke the default when the implementation actually implements the optional callback" do
-    %{behaviour: behaviour, facade: facade, implementation: implementation} =
-      define_facade do
+    %{facade: facade, implementation: implementation} =
+      define_facade_with_mock skip_optional_callbacks: [my_optional_function_with_arguments: 2] do
         defdefault my_optional_function do
           send self(), {__MODULE__, :my_optional_function, []}
 
@@ -101,11 +106,6 @@ defmodule Behaviour.WithOptionalCallbacksTest do
           :my_great_default_with_arguments
         end
       end
-
-    Mox.defmock(implementation,
-      for: behaviour,
-      skip_optional_callbacks: [my_optional_function_with_arguments: 2]
-    )
 
     Mox.expect(implementation, :my_optional_function, fn -> :my_great_implementation end)
 
