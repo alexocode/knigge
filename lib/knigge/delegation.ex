@@ -1,16 +1,22 @@
 defmodule Knigge.Delegation do
+  alias Knigge.Warnings, as: Warn
+
   defmacro __before_compile__(%{module: module}) do
     generate(module)
   end
 
   def generate(module) do
     delegate = get_delegate(module)
-    _definitions = get_definitions(module)
+    definitions = get_definitions(module)
 
     module
     |> Knigge.Behaviour.callbacks()
     |> Enum.map(fn callback ->
-      callback_to_defdelegate(callback, from: module, to: delegate)
+      if callback in definitions do
+        Warn.definition_matching_callback(module, callback)
+      else
+        callback_to_defdelegate(callback, from: module, to: delegate)
+      end
     end)
   end
 
@@ -21,9 +27,7 @@ defmodule Knigge.Delegation do
   end
 
   defp get_definitions(module) do
-    module
-    |> Module.definitions_in()
-    |> Map.new()
+    Module.definitions_in(module)
   end
 
   def callback_to_defdelegate({name, arity}, from: module, to: delegate) do
