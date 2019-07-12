@@ -1,4 +1,5 @@
 defmodule Knigge.Delegation do
+  alias Knigge.Error
   alias Knigge.Warnings, as: Warn
 
   defmacro __using__(_opts) do
@@ -43,11 +44,7 @@ defmodule Knigge.Delegation do
 
         Map.has_key?(defaults, callback) ->
           unless callback in optional_callbacks do
-            raise CompileError,
-              description:
-                "you can not define a default implementation for a non-optional callback, as it will never be invoked.",
-              file: env.file,
-              line: env.line
+            Error.default_for_required_callback!(env)
           end
 
           callback_to_defdefault(callback, to: implementation, default: defaults[callback])

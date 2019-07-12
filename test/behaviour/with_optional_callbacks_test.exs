@@ -51,7 +51,7 @@ defmodule Behaviour.WithOptionalCallbacksTest do
 
   test "raises a CompileError when a default is being defined for a required callback" do
     assert_raise CompileError,
-                 ~r/you can not define a default implementation for a non-optional callback, as it will never be invoked\./,
+                 ~r/you can not define a default implementation for a required callback, as it will never be invoked\./,
                  fn ->
                    define_facade do
                      defdefault(my_required_function, do: :this_should_raise)
