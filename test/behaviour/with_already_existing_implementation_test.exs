@@ -71,4 +71,10 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
 
     assert logs == ""
   end
+
+  test "does not log a Knigge warning for an already existing clause when `warn` is `false`" do
+    %{logs: logs} = define_knigge_facade(warn: false)
+
+    assert logs == ""
+  end
 end

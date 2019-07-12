@@ -5,7 +5,7 @@ defmodule Knigge.Options do
 
   @type t :: [required() | list(optional())]
   @type required :: {:implementation, module()} | {:otp_app, atom()}
-  @type optional :: [do_not_delegate: keyword(arity())]
+  @type optional :: [do_not_delegate: keyword(arity()), warn: boolean()]
 
   @doc """
   Validates the options passed to `Knigge`. It ensures that the required keys
@@ -72,5 +72,5 @@ defmodule Knigge.Options do
   end
 
   defp known_option?({name, _}), do: known_option?(name)
-  defp known_option?(name), do: name in [:implementation, :otp_app, :do_not_delegate]
+  defp known_option?(name), do: name in [:implementation, :otp_app, :do_not_delegate, :warn]
 end

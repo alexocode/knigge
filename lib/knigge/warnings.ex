@@ -3,8 +3,19 @@ defmodule Knigge.Warnings do
 
   require Logger
 
+  defmacrop warn(module, message) do
+    quote do
+      unquote(module)
+      |> Knigge.fetch!(:options)
+      |> Keyword.get(:warn, true)
+      |> if do
+        Logger.warn(unquote(message))
+      end
+    end
+  end
+
   def definition_matching_callback(module, {name, arity}) do
-    Logger.warn(fn ->
+    warn(module, fn ->
       function = "#{name}/#{arity}"
 
       """
