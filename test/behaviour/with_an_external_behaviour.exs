@@ -22,4 +22,12 @@ defmodule Behaviour.WithAnExternalBehaviour do
   test "calling TheFacade.__knigge__(:implementation) returns TheImplementation" do
     assert TheFacade.__knigge__(:implementation) == TheImplementation
   end
+
+  test "calling Facade.my_function invokes the function on the Implementation" do
+    expect(TheImplementation, :my_function, fn -> :ok end)
+
+    assert :ok = TheFacade.my_function()
+
+    verify!(TheImplementation)
+  end
 end

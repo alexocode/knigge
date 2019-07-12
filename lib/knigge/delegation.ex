@@ -27,8 +27,9 @@ defmodule Knigge.Delegation do
   end
 
   def generate(module, env) do
-    callbacks = get_callbacks(module)
-    optional_callbacks = get_optional_callbacks(module)
+    behaviour = Knigge.fetch!(module, :behaviour)
+    callbacks = get_callbacks(behaviour)
+    optional_callbacks = get_optional_callbacks(behaviour)
     do_not_delegate = get_do_not_delegate_option(module)
     definitions = get_definitions(module)
     implementation = get_implementation(module)

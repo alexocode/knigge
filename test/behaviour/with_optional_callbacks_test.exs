@@ -117,4 +117,37 @@ defmodule Behaviour.WithOptionalCallbacksTest do
 
     assert_receive {^facade, :my_optional_function_with_arguments, [42, 1337]}
   end
+
+  test "invokes the default when the behaviour is external from the facade" do
+    behaviour =
+      defmodule_salted Behaviour do
+        @callback my_required_callback() :: no_return
+        @callback my_optional_callback() :: no_return
+
+        @optional_callbacks my_optional_callback: 0
+      end
+
+    implementation =
+      defmock_salted(Implementation,
+        for: behaviour,
+        skip_optional_callbacks: [my_optional_callback: 0]
+      )
+
+    facade =
+      defmodule_salted Facade do
+        use Knigge,
+          behaviour: behaviour,
+          implementation: implementation
+
+        defdefault my_optional_callback do
+          :my_great_default
+        end
+      end
+
+    assert :my_great_default == facade.my_optional_callback()
+
+    Mox.expect(implementation, :my_required_callback, fn -> :my_great_implementation end)
+
+    assert :my_great_implementation == facade.my_required_callback()
+  end
 end
