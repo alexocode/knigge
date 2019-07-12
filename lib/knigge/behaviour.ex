@@ -27,4 +27,12 @@ defmodule Knigge.Behaviour do
     |> Module.get_attribute(:callback)
     |> Enum.map(&Knigge.AST.function_spec_from_callback/1)
   end
+
+  def optional_callbacks(module) do
+    if Module.open?(module) do
+      Module.get_attribute(module, :optional_callbacks) || []
+    else
+      module.behaviour_info(:optional_callbacks)
+    end
+  end
 end
