@@ -6,18 +6,19 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
 
   require Mox
 
-  defmacrop define_knigge_facade do
+  defmacrop define_knigge_facade(knigge_options \\ []) do
     salt = :random.uniform(100_000)
     behaviour = String.to_atom("MyBehaviourWithDefaults#{salt}")
     implementation = String.to_atom("MyImplementation#{salt}")
+    options = Keyword.put(knigge_options, :implementation, implementation)
 
-    quote bind_quoted: [behaviour: behaviour, implementation: implementation] do
+    quote bind_quoted: [behaviour: behaviour, implementation: implementation], unquote: true do
       logs =
         capture_log(fn ->
           warnings =
             capture_io(:stderr, fn ->
               defmodule behaviour do
-                use Knigge, implementation: implementation
+                use Knigge, unquote(options)
 
                 @callback my_function_with_default() :: :ok
                 @callback my_other_function() :: :ok
@@ -46,28 +47,6 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
     end
   end
 
-  test "calling `my_function/0` does not invoke the implementation's version" do
-    %{facade: facade, implementation: implementation} = define_knigge_facade()
-
-    Mox.stub(implementation, :my_function_with_default, fn ->
-      send self(), {implementation, :my_function_with_default, []}
-
-      :ok
-    end)
-
-    Mox.stub(implementation, :my_other_function, fn ->
-      send self(), {implementation, :my_other_function, []}
-
-      :ok
-    end)
-
-    assert :ok = facade.my_other_function()
-    assert :ok = facade.my_function_with_default()
-
-    assert_receive {^implementation, :my_other_function, []}
-    refute_receive {^implementation, :my_function_with_default, []}
-  end
-
   test "does not generate a compilation warning for a clause never matching" do
     %{warnings: warnings} = define_knigge_facade()
 
@@ -85,5 +64,11 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
 
                use Knigge, do_not_delegate: [my_function_with_default: 0]
            """
+  end
+
+  test "does not log a Knigge warning for an already existing clause when `do_not_delegate` is provided for the definition" do
+    %{logs: logs} = define_knigge_facade(do_not_delegate: [my_function_with_default: 0])
+
+    assert logs == ""
   end
 end

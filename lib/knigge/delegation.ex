@@ -6,35 +6,41 @@ defmodule Knigge.Delegation do
   end
 
   def generate(module) do
-    delegate = get_delegate(module)
+    do_not_delegate = get_do_not_delegate_option(module)
     definitions = get_definitions(module)
+    implementation = get_implementation(module)
 
     module
     |> Knigge.Behaviour.callbacks()
+    |> Enum.reject(&(&1 in do_not_delegate))
     |> Enum.map(fn callback ->
       if callback in definitions do
         Warn.definition_matching_callback(module, callback)
       else
-        callback_to_defdelegate(callback, from: module, to: delegate)
+        callback_to_defdelegate(callback, from: module, to: implementation)
       end
     end)
   end
 
-  defp get_delegate(module) do
-    module
-    |> Module.get_attribute(:__knigge__)
-    |> Keyword.fetch!(:implementation)
+  defp get_implementation(module) do
+    Knigge.fetch!(module, :implementation)
   end
 
   defp get_definitions(module) do
     Module.definitions_in(module)
   end
 
-  def callback_to_defdelegate({name, arity}, from: module, to: delegate) do
+  defp get_do_not_delegate_option(module) do
+    module
+    |> Knigge.fetch!(:options)
+    |> Keyword.get(:do_not_delegate, [])
+  end
+
+  def callback_to_defdelegate({name, arity}, from: module, to: implementation) do
     args = Macro.generate_arguments(arity, module)
 
     quote do
-      defdelegate unquote(name)(unquote_splicing(args)), to: unquote(delegate)
+      defdelegate unquote(name)(unquote_splicing(args)), to: unquote(implementation)
     end
   end
 
