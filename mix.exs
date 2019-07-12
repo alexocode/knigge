@@ -23,6 +23,7 @@ defmodule Knigge.MixProject do
   defp deps do
     [
       {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
       {:mox, "~> 0.5", only: :test}
     ]
   end
