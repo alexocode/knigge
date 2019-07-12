@@ -63,40 +63,40 @@ defmodule Behaviour.WithOptionalCallbacksTest do
     %{facade: facade} =
       define_facade do
         defdefault my_optional_function do
-          send self(), {__MODULE__, :fallback_invoked, []}
+          send self(), {__MODULE__, :my_optional_function, []}
 
-          :my_great_fallback
+          :my_great_default
         end
 
         defdefault my_optional_function_with_arguments(arg1, arg2) do
-          send self(), {__MODULE__, :fallback_with_arguments_invoked, [arg1, arg2]}
+          send self(), {__MODULE__, :my_optional_function_with_arguments, [arg1, arg2]}
 
-          :my_great_fallback_with_arguments
+          :my_great_default_with_arguments
         end
       end
 
-    assert :my_great_fallback == facade.my_optional_function()
-    assert_receive {^facade, :fallback_invoked, []}
+    assert :my_great_default == facade.my_optional_function()
+    assert_receive {^facade, :my_optional_function, []}
 
-    assert :my_great_fallback_with_arguments ==
+    assert :my_great_default_with_arguments ==
              facade.my_optional_function_with_arguments(42, 1337)
 
-    assert_receive {^facade, :fallback_with_arguments_invoked, [42, 1337]}
+    assert_receive {^facade, :my_optional_function_with_arguments, [42, 1337]}
   end
 
   test "does not invoke the default when the implementation actually implements the optional callback" do
     %{behaviour: behaviour, facade: facade, implementation: implementation} =
       define_facade do
         defdefault my_optional_function do
-          send self(), {__MODULE__, :fallback_invoked, []}
+          send self(), {__MODULE__, :my_optional, []}
 
-          :my_great_fallback
+          :my_great_default
         end
 
         defdefault my_optional_function_with_arguments(arg1, arg2) do
-          send self(), {__MODULE__, :fallback_with_arguments_invoked, [arg1, arg2]}
+          send self(), {__MODULE__, :my_optional_function_with_arguments, [arg1, arg2]}
 
-          :my_great_fallback_with_arguments
+          :my_great_default_with_arguments
         end
       end
 
@@ -108,13 +108,13 @@ defmodule Behaviour.WithOptionalCallbacksTest do
     Mox.expect(implementation, :my_optional_function, fn -> :my_great_implementation end)
 
     assert :my_great_implementation == facade.my_optional_function()
-    refute_receive {^facade, :fallback_invoked, []}
+    refute_receive {^facade, :my_optional, []}
 
     Mox.verify!(implementation)
 
-    assert :my_great_fallback_with_arguments ==
+    assert :my_great_default_with_arguments ==
              facade.my_optional_function_with_arguments(42, 1337)
 
-    assert_receive {^facade, :fallback_with_arguments_invoked, [42, 1337]}
+    assert_receive {^facade, :my_optional_function_with_arguments, [42, 1337]}
   end
 end
