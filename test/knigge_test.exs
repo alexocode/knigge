@@ -27,6 +27,8 @@ defmodule KniggeTest do
 
         @callback my_function() :: no_return
 
+        # We need to invoke `assert` in the module top level to test what happens
+        # when the module is still open (being defined)
         assert Knigge.fetch!(__MODULE__, :behaviour) == __MODULE__
         assert Knigge.fetch!(__MODULE__, :implementation) == Something
       end
