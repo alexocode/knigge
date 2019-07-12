@@ -57,6 +57,7 @@ defmodule Knigge do
 
   @type key :: :behaviour | :implementation | :options
 
+  @spec __using__(Knigge.Options.t()) :: no_return
   defmacro __using__(options) do
     Knigge.Options.validate!(options)
 
