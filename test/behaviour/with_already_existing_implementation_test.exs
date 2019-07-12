@@ -3,13 +3,13 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
 
   import ExUnit.CaptureLog
   import ExUnit.CaptureIO
+  import Knigge.Test.SaltedModule
 
   require Mox
 
-  defmacrop define_knigge_facade(knigge_options \\ []) do
-    salt = :random.uniform(100_000)
-    behaviour = String.to_atom("MyBehaviourWithDefaults#{salt}")
-    implementation = String.to_atom("MyImplementation#{salt}")
+  defmacrop define_facade(knigge_options \\ []) do
+    behaviour = salt_atom(Behaviour)
+    implementation = salt_atom(Implementation)
     options = Keyword.put(knigge_options, :implementation, implementation)
 
     quote bind_quoted: [behaviour: behaviour, implementation: implementation], unquote: true do
@@ -48,14 +48,14 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
   end
 
   test "does not generate a compilation warning for a clause never matching" do
-    %{warnings: warnings} = define_knigge_facade()
+    %{warnings: warnings} = define_facade()
 
     refute warnings =~
              ~r"this clause cannot match because a previous clause at line \d+ always matches"
   end
 
   test "logs a Knigge warning for an already existing clause because Knigge doesn't know what to do about it" do
-    %{facade: facade, logs: logs} = define_knigge_facade()
+    %{facade: facade, logs: logs} = define_facade()
 
     assert logs =~ """
            Knigge encountered definition `#{facade}.my_function_with_default/0` which matches callback `my_function_with_default/0`.
@@ -67,13 +67,13 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
   end
 
   test "does not log a Knigge warning for an already existing clause when `do_not_delegate` is provided for the definition" do
-    %{logs: logs} = define_knigge_facade(do_not_delegate: [my_function_with_default: 0])
+    %{logs: logs} = define_facade(do_not_delegate: [my_function_with_default: 0])
 
     assert logs == ""
   end
 
   test "does not log a Knigge warning for an already existing clause when `warn` is `false`" do
-    %{logs: logs} = define_knigge_facade(warn: false)
+    %{logs: logs} = define_facade(warn: false)
 
     assert logs == ""
   end
