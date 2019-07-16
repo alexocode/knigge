@@ -49,7 +49,7 @@ defmodule Behaviour.WithOptionalCallbacksTest do
       define_facade_with_mock(skip_optional_callbacks: [my_optional_function: 0])
 
     assert_raise UndefinedFunctionError,
-                 "function #{inspect(implementation)}.my_optional_function/0 is undefined or private",
+                 ~r"function #{inspect(implementation)}\.my_optional_function/0 is undefined or private",
                  fn -> facade.my_optional_function() end
   end
 
