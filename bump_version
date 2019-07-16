@@ -1,0 +1,33 @@
+#/bin/bash
+
+set -e
+
+current_version="$(cat version)"
+new_version="$1"
+
+if [ -z "$new_version" ]; then
+  echo 'ERROR: No version supplied!' >&2
+  echo >&2
+  echo 'Usage:   bump_version <semantic-version>' >&2
+  echo 'Example: bump_version 1.0.0' >&2
+  exit 1
+fi
+
+if [[ "$current_version" = "$new_version" ]]; then
+  echo "Already on version $current_version!" >&2
+  exit 1
+fi
+
+echo "Current Version:  $current_version"
+echo "New Version:      $new_version"
+echo
+ask 'Want to bump?' || exit 1
+
+echo "$new_version" > version
+
+if ask 'Want to commit the version change?' Y; then
+  git commit --message="Project: Bump version from $current_version to $new_version" -- version
+
+  echo
+  ask "Want to add v$new_version tag?" Y && git tag -ae "v$new_version" -m "Release $new_version: "
+fi
