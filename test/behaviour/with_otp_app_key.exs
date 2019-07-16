@@ -1,6 +1,8 @@
 defmodule Behaviour.WithOtpAppKey do
   use ExUnit.Case, async: true
 
+  import Knigge.Test.SaltedModule
+
   test "raises an ArgumentError without a relevant configuration available" do
     assert_raise ArgumentError,
                  ~r/could not fetch application environment #{inspect(__MODULE__)}.RaisingBehaviour for application :missing/,
@@ -12,14 +14,17 @@ defmodule Behaviour.WithOtpAppKey do
   end
 
   test "works fine with the relevant configuration being set in the Application environment" do
-    Application.put_env(:knigge, __MODULE__.WorkingBehaviour, SomeModule)
+    Application.put_env(:knigge, :working_behaviour, SomeModule)
 
     # Should not raise
-    defmodule WorkingBehaviour do
-      use Knigge, otp_app: :knigge
-    end
+    behaviour =
+      defmodule_salted WorkingBehaviour do
+        use Knigge,
+          otp_app: :knigge,
+          config_key: :working_behaviour
+      end
 
-    assert WorkingBehaviour.__knigge__(:implementation) == SomeModule
+    assert behaviour.__knigge__(:implementation) == SomeModule
   end
 
   test "calling my_function/1 delegates the call to the implementation" do
