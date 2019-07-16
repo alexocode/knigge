@@ -1,13 +1,13 @@
 defmodule Knigge do
   @moduledoc """
-  `Knigge` offers an opinionated way of dealing with elixir behaviours.
+  An opinionated set of rules to for your behaviours
 
   Opinionated means that it offers an easy way of defining a "facade" for a
-  behaviour which then delegates calls to the real implementation, which is
-  either given directly to `Knigge` or fetched from the configuration.
+  behaviour. This facade then delegates calls to the real implementation, which
+  is either given directly to `Knigge` or fetched from the configuration.
 
-  `Knigge` can either be used directly in a behaviour or in separate module by
-  passing the behaviour which should be "facaded" as an option to `Knigge`.
+  `Knigge` can be `use`d directly in a behaviour, or in a separate module by
+  passing the behaviour which should be "facaded" as an option.
 
   ## Examples
 
@@ -22,7 +22,7 @@ defmodule Knigge do
       defmodule MyGreatBehaviourFacade do
         @behaviour MyGreatBehaviour
 
-        @implementation Application.get_env(:my_application, MyGreatBehaviourFacade)
+        @implementation Application.fetch_env!(:my_application, __MODULE__)
 
         defdelegate my_great_callback, to: @implementation
       end
@@ -55,6 +55,10 @@ defmodule Knigge do
 
   `Knigge` expects either the `otp_app` key or the `implementation` key. If
   neither is provided an error will be raised at compile time.
+
+  When using the `otp_app` configuration you can also pass `config_key`, which
+  results in a call looking like this: `Application.fetch_env!(otp_app, config_key)`.
+  `config_key` defaults to `__MODULE__`.
 
   For further information check the `Knigge.Options` module.
   """
