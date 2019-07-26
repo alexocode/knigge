@@ -1,5 +1,7 @@
 defmodule Knigge.Code do
   @moduledoc """
+  Internal module responsible of injecting the delegations into the calling module.
+
   Injects the actual delegations to the implementing module. For this it gets
   registered as a `before_compile`-hook from where it fetches all callbacks from
   the behaviour and generates delegating functions for each callback.

@@ -1,5 +1,7 @@
 defmodule Knigge.Implementation do
   @moduledoc """
+  Internal module to work with the supplied implementation.
+
   Fetches the implementing modules based on the `Knigge.Options.implementation`
   value. Currently it supports passing the implementation directly or fetching
   it from the application environment.

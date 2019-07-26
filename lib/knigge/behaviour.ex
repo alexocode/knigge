@@ -1,6 +1,9 @@
 defmodule Knigge.Behaviour do
   @moduledoc """
-  This module offers functions to interact with behaviours and callbacks.
+  Internal module to work with the supplied behaviour.
+
+  Can be used to fetch the behaviour from the `Knigge.Options`-struct and to
+  access the callbacks defined by the behaviour.
 
   It works whether the module is already compiled or still open, for which it
   uses `Module.open?/1`. If the module is still open it directly accesses the
