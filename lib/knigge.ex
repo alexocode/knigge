@@ -68,7 +68,11 @@ defmodule Knigge do
   @spec __using__(Knigge.Options.t()) :: no_return
   defmacro __using__(options) do
     quote bind_quoted: [options: options] do
-      use Knigge.Delegation
+      import Knigge.Delegation, only: [defdefault: 2]
+
+      @before_compile Knigge.Delegation
+
+      Module.register_attribute(__MODULE__, :__knigge__, accumulate: true)
 
       options =
         options
@@ -81,7 +85,7 @@ defmodule Knigge do
         |> Knigge.Behaviour.fetch!()
         |> Knigge.Module.ensure_exists!(options, __ENV__)
 
-      @__knigge__ options
+      @__knigge__ {:options, options}
 
       @doc "Access Knigge internal values, such as the implementation being delegated to etc."
       @spec __knigge__(:behaviour) :: module()
@@ -89,7 +93,7 @@ defmodule Knigge do
       @spec __knigge__(:options) :: Knigge.Options.t()
 
       def __knigge__(:behaviour), do: unquote(behaviour)
-      def __knigge__(:options), do: @__knigge__
+      def __knigge__(:options), do: @__knigge__[:options]
 
       case options.delegate_at do
         :compile_time ->
@@ -115,7 +119,7 @@ defmodule Knigge do
   def options!(module) do
     cond do
       Module.open?(module) ->
-        Module.get_attribute(module, :__knigge__)
+        Module.get_attribute(module, :__knigge__)[:options]
 
       function_exported?(module, :__knigge__, 1) ->
         module.__knigge__(:options)

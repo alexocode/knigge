@@ -1,16 +1,11 @@
 defmodule Knigge.Delegation do
+  @moduledoc """
+  Injects the actual delegations to the implementing module. For this it
+  registers itself as a `before_compile`-hook where it
+  """
+
   alias Knigge.Error
   alias Knigge.Warnings, as: Warn
-
-  defmacro __using__(_opts) do
-    quote do
-      import unquote(__MODULE__), only: [defdefault: 2]
-
-      @before_compile unquote(__MODULE__)
-
-      Module.register_attribute(__MODULE__, :__knigge_defaults__, accumulate: true)
-    end
-  end
 
   defmacro defdefault({_name, _meta, _args} = definition, do: block) do
     do_defdefault(definition, do: block)
@@ -21,7 +16,7 @@ defmodule Knigge.Delegation do
     value = {Macro.escape(args), Macro.escape(block)}
 
     quote do
-      @__knigge_defaults__ {unquote(key), unquote(value)}
+      @__knigge__ {:defdefault, {unquote(key), unquote(value)}}
     end
   end
 
@@ -102,7 +97,8 @@ defmodule Knigge.Delegation do
 
   defp get_defaults(module) do
     module
-    |> Module.get_attribute(:__knigge_defaults__)
+    |> Module.get_attribute(:__knigge__)
+    |> Keyword.get_values(:defdefault)
     |> Map.new()
   end
 
