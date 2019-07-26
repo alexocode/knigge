@@ -73,7 +73,7 @@ defmodule Knigge.Options do
   Checks the validity of the given opts (`validate!/1`), applies defaults and
   puts them into the `#{inspect(__MODULE__)}`-struct.
   """
-  @spec new(raw()) :: t()
+  @spec new(options :: raw()) :: t()
   def new(opts) do
     opts =
       opts
