@@ -1,7 +1,10 @@
 defmodule Knigge.Delegation do
   @moduledoc """
-  Injects the actual delegations to the implementing module. For this it
-  registers itself as a `before_compile`-hook where it
+  Injects the actual delegations to the implementing module. For this it gets
+  registered as a `before_compile`-hook from where it fetches all callbacks from
+  the behaviour and generates delegating functions for each callback.
+
+  It also defines the `defdefault` macro.
   """
 
   alias Knigge.Error
