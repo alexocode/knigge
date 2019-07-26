@@ -6,7 +6,6 @@ defmodule Knigge.MixProject do
   def project do
     [
       app: :knigge,
-      version: @version,
       elixir: ">= 1.7.4 and < 2.0.0",
       elixirc_paths: elixirc_paths(Mix.env()),
       preferred_cli_env: [
