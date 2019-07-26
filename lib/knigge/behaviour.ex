@@ -10,7 +10,9 @@ defmodule Knigge.Behaviour do
   Keyword list.
   """
 
-  def fetch!(%{behaviour: behaviour}) do
+  alias Knigge.Options
+
+  def fetch!(%Options{behaviour: behaviour}) do
     behaviour
   end
 

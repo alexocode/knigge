@@ -14,4 +14,12 @@ defmodule Knigge.Implementation do
   def fetch!(%Options{implementation: implementation}) do
     implementation
   end
+
+  def fetch_for!(module, env) do
+    opts = Knigge.options!(module)
+
+    opts
+    |> Knigge.Implementation.fetch!()
+    |> Knigge.Module.ensure_exists!(opts, env)
+  end
 end

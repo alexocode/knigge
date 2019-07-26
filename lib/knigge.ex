@@ -77,9 +77,9 @@ defmodule Knigge do
   @spec __using__(Knigge.Options.t()) :: no_return
   defmacro __using__(options) do
     quote bind_quoted: [options: options] do
-      import Knigge.Delegation, only: [defdefault: 2]
+      import Knigge.Code, only: [defdefault: 2]
 
-      @before_compile Knigge.Delegation
+      @before_compile Knigge.Code
 
       Module.register_attribute(__MODULE__, :__knigge__, accumulate: true)
 
