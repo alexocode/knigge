@@ -113,8 +113,7 @@ defmodule Knigge.Options do
   are present and that no unknown keys are passed to `Knigge` which might
   indicate a spelling error.
 
-  Required: `implementation` or `otp_app`
-  Optional: `do_not_delegate`
+  See the moduledocs for details on required and optional options.
 
   ## Examples
 
