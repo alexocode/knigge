@@ -1,4 +1,6 @@
 defmodule Knigge.AST do
+  @moduledoc false
+
   def function_spec_from_callback({
         :callback,
         {
