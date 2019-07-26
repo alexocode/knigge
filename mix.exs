@@ -59,7 +59,7 @@ defmodule Knigge.MixProject do
     if Version.match?(System.version(), "< 1.7.0") do
       "~> 0.18.0"
     else
-      "~> 0.19"
+      "~> 0.21"
     end
   end
 
