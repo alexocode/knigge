@@ -12,14 +12,23 @@ defmodule Knigge.Delegation do
     end
   end
 
-  defmacro defdefault({name, _meta, args}, do: block) do
-    args = args || []
+  defmacro defdefault({_name, _meta, _args} = definition, do: block) do
+    do_defdefault(definition, do: block)
+  end
+
+  defp do_defdefault({name, _meta, args}, do: block) when is_list(args) do
     key = {name, length(args)}
     value = {Macro.escape(args), Macro.escape(block)}
 
     quote do
       @__knigge_defaults__ {unquote(key), unquote(value)}
     end
+  end
+
+  # The `args` are not a list for definitions like `defdefault my_default, do: :ok`
+  # where no parenthesis follow after `my_default`
+  defp do_defdefault({name, meta, _args}, do: block) do
+    do_defdefault({name, meta, []}, do: block)
   end
 
   defmacro __before_compile__(%{module: module} = env) do
