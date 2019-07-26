@@ -1,6 +1,6 @@
 defmodule Knigge do
   @moduledoc """
-  An opinionated set of rules to for your behaviours
+  An opinionated set of rules to for your behaviours.
 
   Opinionated means that it offers an easy way of defining a "facade" for a
   behaviour. This facade then delegates calls to the real implementation, which
