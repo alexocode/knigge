@@ -51,7 +51,10 @@ defmodule Knigge.MixProject do
 
       # Test
       {:excoveralls, "~> 0.10", only: :test},
-      {:mox, "~> 0.5", only: :test}
+      {:mox, "~> 0.5", only: :test},
+
+      # Docs
+      {:inch_ex, only: :docs}
     ]
   end
 
