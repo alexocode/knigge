@@ -1,4 +1,7 @@
 # Knigge
+[![Build Status](https://travis-ci.org/sascha-wolf/knigge.svg?branch=master)](https://travis-ci.org/sascha-wolf/knigge)
+[![Coverage Status](https://coveralls.io/repos/github/sascha-wolf/knigge/badge.svg?branch=master)](https://coveralls.io/github/sascha-wolf/knigge?branch=master)
+[![Hex.pm](https://img.shields.io/hexpm/v/knigge.svg)](https://hex.pm/packages/knigge)
 
 An opinionated way of dealing with behaviours.
 
