@@ -60,7 +60,16 @@ defmodule Knigge do
   results in a call looking like this: `Application.fetch_env!(otp_app, config_key)`.
   `config_key` defaults to `__MODULE__`.
 
-  For further information check the `Knigge.Options` module.
+  By default `Knigge` does as much work as possible at compile time. This will
+  be fine most of the time. In case you want to swap out the implementation at
+  runtime - by calling `Application.put_env/2` - you can force `Knigge` to do all
+  delegation at runtime. As you might expect this impacts runtime speed negatively,
+  since the implementing module will have to be loaded for each call.
+
+  If you want to do delegation at runtime simply pass `delegate_at: :runtime` as
+  option.
+
+  For further information about options check the `Knigge.Options` module.
   """
 
   @type key :: :behaviour | :implementation | :options
