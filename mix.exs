@@ -7,7 +7,7 @@ defmodule Knigge.MixProject do
     [
       app: :knigge,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: ">= 1.7.4 and < 2.0.0",
       elixirc_paths: elixirc_paths(Mix.env()),
       preferred_cli_env: [
         coveralls: :test,
@@ -54,7 +54,7 @@ defmodule Knigge.MixProject do
       {:mox, "~> 0.5", only: :test},
 
       # Docs
-      {:inch_ex, only: :docs}
+      {:inch_ex, ">= 0.0.0", only: :docs}
     ]
   end
 
