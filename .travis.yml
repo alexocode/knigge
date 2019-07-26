@@ -6,9 +6,6 @@ cache:
     - _build/
 
 elixir:
-  - 1.6.0
-  - 1.6.6
-  - 1.7.0
   - 1.7.4
   - 1.8.2
   - 1.9.0
@@ -30,14 +27,6 @@ stages:
     if: tag =~ ^v
 
 jobs:
-  exclude:
-    - elixir: 1.6.0
-      otp_release: 21.0
-    - elixir: 1.6.0
-      otp_release: 21.1.1
-    - elixir: 1.6.0
-      otp_release: 22.0.7
-
   include:
     - stage: test
       script: mix coveralls.travis
