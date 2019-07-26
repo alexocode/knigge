@@ -71,7 +71,7 @@ defmodule Knigge.MixProject do
   #######
 
   def description do
-    "An opinionated set of rules to for your behaviours"
+    "An opinionated way of dealing with behaviours."
   end
 
   def package do
