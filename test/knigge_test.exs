@@ -1,12 +1,12 @@
 defmodule KniggeTest do
   use ExUnit.Case, async: true
 
-  describe ".fetch!/2" do
+  describe ".options!/1" do
     test "with a module not using Knigge" do
       assert_raise ArgumentError,
                    "expected a module using Knigge but DoesNotExist does not.",
                    fn ->
-                     Knigge.fetch!(DoesNotExist, :implementation)
+                     Knigge.options!(DoesNotExist)
                    end
     end
 
@@ -19,8 +19,10 @@ defmodule KniggeTest do
         @callback my_function() :: no_return
       end
 
-      assert Knigge.fetch!(MyModuleUsingKnigge, :behaviour) == MyModuleUsingKnigge
-      assert Knigge.fetch!(MyModuleUsingKnigge, :implementation) == Something
+      assert %Knigge.Options{
+               behaviour: MyModuleUsingKnigge,
+               implementation: Something
+             } = Knigge.options!(MyModuleUsingKnigge)
     end
 
     test "with a module using Knigge being open" do
@@ -33,8 +35,10 @@ defmodule KniggeTest do
 
         # We need to invoke `assert` in the module top level to test what happens
         # when the module is still open (being defined)
-        assert Knigge.fetch!(__MODULE__, :behaviour) == __MODULE__
-        assert Knigge.fetch!(__MODULE__, :implementation) == Something
+        assert %Knigge.Options{
+                 behaviour: __MODULE__,
+                 implementation: Something
+               } = Knigge.options!(__MODULE__)
       end
     end
   end

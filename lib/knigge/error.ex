@@ -8,16 +8,9 @@ defmodule Knigge.Error do
     )
   end
 
-  def behaviour_not_loaded!(module, env) do
+  def module_not_loaded!(module, env) do
     raise_compile_error(
-      "the behaviour module could not be found: #{inspect(module)}",
-      env
-    )
-  end
-
-  def implementation_not_loaded!(module, env) do
-    raise_compile_error(
-      "the implementing module could not be found: #{inspect(module)}",
+      "the given module could not be found: #{inspect(module)}",
       env
     )
   end

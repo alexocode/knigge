@@ -1,6 +1,7 @@
 defmodule Knigge.Options do
   @moduledoc """
-  Specifies valid `Knigge`-options and offers `validate!/1` to enforce the specification.
+  Specifies valid `Knigge`-options and allows to validate and encapsulate the
+  options in a struct.
 
   `Knigge` differentiates between **required** and _optional_ options:
 
@@ -31,7 +32,7 @@ defmodule Knigge.Options do
 
   import Keyword, only: [has_key?: 2, keyword?: 1]
 
-  @type t :: [required() | list(optional())]
+  @type raw :: [required() | list(optional())]
 
   @type required :: {:implementation, implementation()} | {:otp_app, otp_app()}
   @type optional :: [
@@ -50,16 +51,62 @@ defmodule Knigge.Options do
   @type otp_app :: atom()
   @type warn :: boolean()
 
-  @option_types [
-    behaviour: :module,
-    check_if_exists?: :boolean,
-    delegate_at: [:compile_time, :runtime],
-    do_not_delegate: :keyword,
-    implementation: :module,
-    otp_app: :atom,
-    config_key: :atom,
-    warn: :boolean
+  @type t :: %__MODULE__{
+          implementation: implementation() | {:config, otp_app(), config_key()},
+          behaviour: behaviour(),
+          delegate_at: delegate_at(),
+          do_not_delegate: do_not_delegate(),
+          warn: warn()
+        }
+
+  defstruct [
+    :behaviour,
+    :check_if_exists?,
+    :delegate_at,
+    :do_not_delegate,
+    :implementation,
+    :config_key,
+    :warn
   ]
+
+  @doc """
+  Checks the validity of the given opts (`validate!/1`), applies defaults and
+  puts them into the `#{inspect(__MODULE__)}`-struct.
+  """
+  @spec new(raw()) :: t()
+  def new(opts) do
+    opts =
+      opts
+      |> validate!()
+      |> with_defaults()
+      |> Keyword.put_new_lazy(:implementation, fn ->
+        {:config, opts[:opt_app], opts[:config_key]}
+      end)
+
+    struct(__MODULE__, opts)
+  end
+
+  @defaults [
+    check_if_exists?: true,
+    delegate_at: :compile_time,
+    do_not_delegate: [],
+    warn: true
+  ]
+
+  @doc """
+  Applies the defaults to the given options:
+  #{
+    @defaults
+    |> Enum.map(fn {key, value} ->
+      "  - #{key} = #{inspect(value)}"
+    end)
+    |> Enum.join("\n")
+  }
+  """
+  @spec with_defaults(raw()) :: raw()
+  def with_defaults(opts) do
+    Keyword.merge(@defaults, opts)
+  end
 
   @doc """
   Validates the options passed to `Knigge`. It ensures that the required keys
@@ -95,7 +142,7 @@ defmodule Knigge.Options do
       iex> Knigge.Options.validate!(otp_app: :knigge, delegate_at: :compailtime)
       ** (ArgumentError) Knigge received invalid value for `delegate_at`. Expected :compile_time or :runtime but received: :compailtime
   """
-  @spec validate!(t()) :: no_return
+  @spec validate!(raw()) :: no_return
   def validate!(opts) do
     validate_keyword!(opts)
     validate_required!(opts)
@@ -154,6 +201,17 @@ defmodule Knigge.Options do
                 "Expected #{expected_value(name)} but received: #{inspect(value)}"
     end
   end
+
+  @option_types [
+    behaviour: :module,
+    check_if_exists?: :boolean,
+    delegate_at: [:compile_time, :runtime],
+    do_not_delegate: :keyword,
+    implementation: :module,
+    otp_app: :atom,
+    config_key: :atom,
+    warn: :boolean
+  ]
 
   @option_names Keyword.keys(@option_types)
 

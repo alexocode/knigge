@@ -36,13 +36,12 @@ defmodule Knigge.Delegation do
   end
 
   def generate(module, env) do
-    behaviour = Knigge.fetch!(module, :behaviour)
+    behaviour = get_behaviour(module, env)
     callbacks = get_callbacks(behaviour)
     optional_callbacks = get_optional_callbacks(behaviour)
-    delegate_at = get_option(module, :delegate_at) || :compile_time
-    do_not_delegate = get_option(module, :do_not_delegate) || []
+    delegate_at = get_option(module, :delegate_at)
+    do_not_delegate = get_option(module, :do_not_delegate)
     definitions = get_definitions(module)
-    implementation = get_implementation(module)
     defaults = get_defaults(module)
 
     for callback <- callbacks do
@@ -60,18 +59,27 @@ defmodule Knigge.Delegation do
 
           callback_to_defdefault(callback,
             from: module,
-            to: implementation,
             default: defaults[callback],
-            delegate_at: delegate_at
+            delegate_at: delegate_at,
+            env: env
           )
 
         true ->
           callback_to_defdelegate(callback,
             from: module,
-            to: implementation
+            delegate_at: delegate_at,
+            env: env
           )
       end
     end
+  end
+
+  defp get_behaviour(module, env) do
+    opts = Knigge.options!(module)
+
+    opts
+    |> Knigge.Behaviour.fetch!()
+    |> Knigge.Module.ensure_exists!(opts, env)
   end
 
   defp get_callbacks(module) do
@@ -84,12 +92,8 @@ defmodule Knigge.Delegation do
 
   defp get_option(module, key) do
     module
-    |> Knigge.fetch!(:options)
-    |> Keyword.get(key)
-  end
-
-  defp get_implementation(module) do
-    Knigge.fetch!(module, :implementation)
+    |> Knigge.options!()
+    |> Map.get(key)
   end
 
   defp get_definitions(module) do
@@ -105,10 +109,12 @@ defmodule Knigge.Delegation do
   defp callback_to_defdefault(
          {name, arity},
          from: module,
-         to: implementation,
          default: {args, block},
-         delegate_at: :compile_time
+         delegate_at: :compile_time,
+         env: env
        ) do
+    implementation = fetch_implementation!(module, env)
+
     cond do
       Module.open?(implementation) ->
         Warn.defdefault_for_open_implementation(module,
@@ -120,9 +126,9 @@ defmodule Knigge.Delegation do
         callback_to_defdefault(
           {name, arity},
           from: module,
-          to: implementation,
           default: {args, block},
-          delegate_at: :runtime
+          delegate_at: :runtime,
+          env: env
         )
 
       function_exported?(implementation, name, arity) ->
@@ -142,17 +148,33 @@ defmodule Knigge.Delegation do
   defp callback_to_defdefault(
          {name, arity},
          from: _module,
-         to: implementation,
          default: {args, block},
-         delegate_at: :runtime
+         delegate_at: :runtime,
+         env: _env
        ) do
     quote do
       def unquote(name)(unquote_splicing(args)) do
-        if function_exported?(unquote(implementation), unquote(name), unquote(arity)) do
-          apply(unquote(implementation), unquote(name), unquote(args))
+        implementation = __knigge__(:implementation)
+
+        if function_exported?(implementation, unquote(name), unquote(arity)) do
+          apply(implementation, unquote(name), unquote(args))
         else
           unquote(block)
         end
+      end
+    end
+  end
+
+  defp callback_to_defdelegate({name, arity}, from: module, delegate_at: :compile_time, env: env) do
+    callback_to_defdelegate({name, arity}, from: module, to: fetch_implementation!(module, env))
+  end
+
+  defp callback_to_defdelegate({name, arity}, from: _module, delegate_at: :runtime, env: _env) do
+    quote bind_quoted: [name: name, arity: arity] do
+      args = Macro.generate_arguments(arity, __MODULE__)
+
+      def unquote(name)(unquote_splicing(args)) do
+        apply(__knigge__(:implementation), unquote(name), unquote(args))
       end
     end
   end
@@ -163,5 +185,13 @@ defmodule Knigge.Delegation do
 
       defdelegate unquote(name)(unquote_splicing(args)), to: implementation
     end
+  end
+
+  defp fetch_implementation!(module, env) do
+    opts = Knigge.options!(module)
+
+    opts
+    |> Knigge.Implementation.fetch!()
+    |> Knigge.Module.ensure_exists!(opts, env)
   end
 end

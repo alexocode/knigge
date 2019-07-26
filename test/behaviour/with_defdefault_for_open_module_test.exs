@@ -57,7 +57,7 @@ defmodule Behaviour.WithDefdefaultForOpenModuleTest do
            this enables to compiler to finish compilation of `#{inspect(implementation)}` before compiling `#{
         inspect(facade)
       }`
-        2. pass `delegate_at: :runtime` as option if this is acceptable for you to silence this warning
+        2. pass `delegate_at: :runtime` as option, this will move **all** delegation to runtime
       """
     )
   end

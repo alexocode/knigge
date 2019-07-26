@@ -68,41 +68,57 @@ defmodule Knigge do
   @spec __using__(Knigge.Options.t()) :: no_return
   defmacro __using__(options) do
     quote bind_quoted: [options: options] do
-      Knigge.Options.validate!(options)
-
       use Knigge.Delegation
 
-      options = Keyword.put(options, :env, __ENV__)
-      behaviour = Knigge.Behaviour.fetch!(__MODULE__, options)
-      implementation = Knigge.Implementation.fetch!(__MODULE__, options)
+      options =
+        options
+        |> Keyword.put_new(:behaviour, __MODULE__)
+        |> Keyword.put_new(:config_key, __MODULE__)
+        |> Knigge.Options.new()
 
-      @__knigge__ [
-        behaviour: behaviour,
-        implementation: implementation,
-        options: options
-      ]
+      behaviour =
+        options
+        |> Knigge.Behaviour.fetch!()
+        |> Knigge.Module.ensure_exists!(options, __ENV__)
+
+      @__knigge__ options
 
       @doc "Access Knigge internal values, such as the implementation being delegated to etc."
       @spec __knigge__(:behaviour) :: module()
       @spec __knigge__(:implementation) :: module()
       @spec __knigge__(:options) :: Knigge.Options.t()
-      def __knigge__(key), do: Keyword.fetch!(@__knigge__, key)
+
+      def __knigge__(:behaviour), do: unquote(behaviour)
+      def __knigge__(:options), do: @__knigge__
+
+      case options.delegate_at do
+        :compile_time ->
+          implementation =
+            options
+            |> Knigge.Implementation.fetch!()
+            |> Knigge.Module.ensure_exists!(options, __ENV__)
+
+          def __knigge__(:implementation) do
+            unquote(implementation)
+          end
+
+        :runtime ->
+          def __knigge__(:implementation) do
+            Knigge.Implementation.fetch!(__knigge__(:options))
+          end
+      end
     end
   end
 
-  @doc "Access Knigge internal values, such as the implementation being delegated to etc."
-  @spec fetch!(module(), :behaviour) :: module()
-  @spec fetch!(module(), :implementation) :: module()
-  @spec fetch!(module(), :options) :: Knigge.Options.t()
-  def fetch!(module, key) do
+  @doc "Access the options passed to Knigge for a module"
+  @spec options!(module()) :: Knigge.Options.t()
+  def options!(module) do
     cond do
       Module.open?(module) ->
-        module
-        |> Module.get_attribute(:__knigge__)
-        |> Keyword.fetch!(key)
+        Module.get_attribute(module, :__knigge__)
 
       function_exported?(module, :__knigge__, 1) ->
-        module.__knigge__(key)
+        module.__knigge__(:options)
 
       true ->
         raise ArgumentError, "expected a module using Knigge but #{inspect(module)} does not."

@@ -6,8 +6,8 @@ defmodule Knigge.Warnings do
   defmacrop warn(module, message) do
     quote do
       unquote(module)
-      |> Knigge.fetch!(:options)
-      |> Keyword.get(:warn, true)
+      |> Knigge.options!()
+      |> Map.get(:warn)
       |> if do
         unquote(message)
         |> Knigge.Warnings.sanitze()
@@ -30,7 +30,7 @@ defmodule Knigge.Warnings do
          this enables to compiler to finish compilation of `#{inspect(implementation)}` before compiling `#{
       inspect(module)
     }`
-      2. pass `delegate_at: :runtime` as option if this is acceptable for you to silence this warning
+      2. pass `delegate_at: :runtime` as option, this will move **all** delegation to runtime
     """)
   end
 

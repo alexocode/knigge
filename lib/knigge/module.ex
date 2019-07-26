@@ -1,11 +1,17 @@
 defmodule Knigge.Module do
   @moduledoc false
 
-  def exists?(module, opts) do
-    not Knigge.Options.check_if_exists?(opts) or do_exists?(module)
+  def ensure_exists!(module, %{} = opts, env) do
+    unless Knigge.Module.exists?(module, opts) do
+      Knigge.Error.module_not_loaded!(module, env)
+    end
+
+    module
   end
 
-  defp do_exists?(module) do
+  def exists?(_module, %{check_if_exists?: false}), do: true
+
+  def exists?(module, %{check_if_exists?: true}) do
     Code.ensure_loaded?(module) or Module.open?(module)
   end
 end
