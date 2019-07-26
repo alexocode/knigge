@@ -1,0 +1,63 @@
+language: elixir
+sudo: false
+cache:
+  directories:
+    - deps/
+    - _build/
+
+elixir:
+  - 1.6.0
+  - 1.6.6
+  - 1.7.0
+  - 1.7.4
+  - 1.8.2
+  - 1.9.0
+
+otp_release:
+  - 20.0
+  - 20.3
+  - 21.0
+  - 22.0.7
+
+env:
+  - MIX_ENV=test
+stages:
+  - name: test
+    if: NOT branch =~ ^wip/
+  - name: docs
+    if: branch = master
+  - name: publish
+    if: tag =~ ^v
+
+jobs:
+  exclude:
+    - elixir: 1.6.0
+      otp_release: 21.0
+    - elixir: 1.6.0
+      otp_release: 21.1.1
+    - elixir: 1.6.0
+      otp_release: 22.0.7
+
+  include:
+    - stage: test
+      script: mix coveralls.travis
+    - stage: docs
+      script: mix hex.publish docs --yes
+      elixir: 1.9.0
+      otp_release: 22.0.7
+      env:
+        - MIX_ENV=dev
+    - stage: publish
+      script: mix hex.publish --yes
+      elixir: 1.9.0
+      otp_release: 22.0.7
+      env:
+        - MIX_ENV=dev
+
+after_script:
+  - MIX_ENV=docs mix deps.get
+  - MIX_ENV=docs mix inch.report
+
+notifications:
+  recipients:
+    - swolf.dev@gmail.com
