@@ -16,6 +16,24 @@ defmodule Knigge.Warnings do
     end
   end
 
+  def defdefault_for_open_implementation(
+        module,
+        implementation: implementation,
+        function: {name, arity}
+      ) do
+    warn(module, """
+    Knigge encountered a `defdefault` while the implementation `#{inspect(implementation)}` was still being compiled.
+    This means Knigge can not determine whether it implements `#{name}/#{arity}` at compile time but needs to fallback to a runtime check.
+
+    There are two ways to resolve this warning:
+      1. move the behaviour into a separate module and `use Knigge, behaviour: MyBehaviour`;
+         this enables to compiler to finish compilation of `#{inspect(implementation)}` before compiling `#{
+      inspect(module)
+    }`
+      2. pass `delegate_at: :runtime` as option if this is acceptable for you to silence this warning
+    """)
+  end
+
   def definition_matching_callback(module, {name, arity}) do
     function = "#{name}/#{arity}"
 

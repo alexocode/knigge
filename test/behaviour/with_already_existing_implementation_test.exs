@@ -1,5 +1,5 @@
 defmodule Behaviour.WithAlreadyExistingImplementationTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   import ExUnit.CaptureIO
   import Knigge.Test.SaltedModule
@@ -49,11 +49,14 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
   test "prints a Knigge warning for an already existing clause because Knigge doesn't know what to do about it" do
     %{facade: facade, warnings: warnings} = define_facade()
 
-    assert warnings =~ """
-           Knigge encountered definition `#{facade}.my_function_with_default/0` which matches callback `my_function_with_default/0`. It will not delegate this callback!
-                    If this is your intention you can tell Knigge to ignore this callback:
-                      use Knigge, do_not_delegate: [my_function_with_default: 0]
-           """
+    assert_lines(
+      warnings,
+      """
+      Knigge encountered definition `#{facade}.my_function_with_default/0` which matches callback `my_function_with_default/0`. It will not delegate this callback!
+      If this is your intention you can tell Knigge to ignore this callback:
+        use Knigge, do_not_delegate: [my_function_with_default: 0]
+      """
+    )
   end
 
   test "does not print a Knigge warning for an already existing clause when `do_not_delegate` is provided for the definition" do
@@ -66,5 +69,16 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
     %{warnings: warnings} = define_facade(warn: false)
 
     assert warnings == ""
+  end
+
+  defp assert_lines(received, expected) do
+    [
+      String.split(received, "\n"),
+      String.split(expected, "\n")
+    ]
+    |> Enum.zip()
+    |> Enum.each(fn {received, expected} ->
+      assert received =~ expected
+    end)
   end
 end
