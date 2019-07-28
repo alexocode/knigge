@@ -107,6 +107,60 @@ defmodule MyGreatBehaviourFacade do
 end
 ```
 
+### `defdefault` - Fallback implementations for optional callbacks
+
+Now imagine you have a more sophisticated behaviour with some optional callbacks:
+
+```elixir
+defmodule MySophisticatedBehaviour do
+  @callback an_optional_callback() :: any()
+  @callback a_required_callback() :: any()
+
+  @optional_callbacks an_optional_callback: 0
+end
+```
+
+As you would expect `Knigge` delegates calls to this callback as usual. But
+since it's optional this delegation might fail. A common pattern is to check
+if the implementation exports the function in question:
+
+```elixir
+if function_exported?(MyImplementation, :an_optional_callback, 0) do
+  MyImplementation.an_optional_callback()
+else
+  :my_fallback_implementation
+end
+```
+
+`Knigge` offers an easy way to specify these fallback implementations with
+`defdefault`:
+
+```elixir
+defmodule MySophisticatedFacade do
+  use Knigge,
+    behaviour: MySophisticatedBehaviour,
+    otp_app: :my_application
+
+  defdefault an_optional_callback do
+    :my_fallback_implementation
+  end
+end
+```
+
+`Knigge` tries to determine at compile-time if the implementation exports
+the function in question and only uses the default if this is not the case.
+As such `defdefault` incurs no runtime overhead and compiles to simple `def`.
+
+Of course `defdefault`s can accept arguments as any usual function:
+
+```elixir
+defdefault my_optional_callback_with_arguments(first_argument, another_argument) do
+  case first_argument do
+    # ...
+  end
+end
+```
+
 ## Options
 
 `Knigge` expects either the `otp_app` key or the `implementation` key. If
