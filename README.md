@@ -26,6 +26,22 @@ def deps do
 end
 ```
 
+## Motivation
+
+`Knigge` was born out of a desire to standardize dealing with behaviours and
+their implementations.
+
+As a great fan of [`mox`](https://github.com/plataformatec/mox), I longed for
+an easy way to swap out implementations from the configuration which lead me
+to introducing a facade pattern, where a module's sole responsibility was
+loading the correct implementation and delegating calls.
+
+This pattern turned out to be very flexible and useful but required a fair bit
+of boilerplate code. `Knigge` was born out of an attempt to reduce this
+boilerplate to the absolute minimum.
+
+But see for yourself.
+
 ## Examples
 
 Imagine a behaviour looking like this:
@@ -65,7 +81,20 @@ defmodule MyGreatBehaviourFacade do
 end
 ```
 
+Technically even passing the `behaviour` is optional, it defaults to
+the current `__MODULE__`. This means that the example from above could
+be shortened even more to:
+
+```elixir
+defmodule MyGreatBehaviour do
+  use Knigge, otp_app: :my_application
+
+  @callback my_great_callback(my_argument :: any()) :: any()
+end
+```
+
 Under the hood this compiles down to the explicit delegation visible on the top.
+
 In case you don't want to fetch your implementation from the configuration,
 `Knigge` also allows you to explicitely pass the implementation of the
 behaviour with the aptly named key `implementation`:
