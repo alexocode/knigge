@@ -14,7 +14,7 @@ defmodule Knigge do
   `Knigge` was born out of a desire to standardize dealing with behaviours and
   their implementations.
 
-  As a great fan of [`mox`](https://github.com/plataformatec/mox), I longed for
+  As a great fan of [`mox`](https://github.com/plataformatec/mox) I longed for
   an easy way to swap out implementations from the configuration which lead me
   to introducing a facade pattern, where a module's sole responsibility was
   loading the correct implementation and delegating calls.
@@ -103,7 +103,7 @@ defmodule Knigge do
 
   `Knigge` tries to determine at compile-time if the implementation exports
   the function in question and only uses the default if this is not the case.
-  As such `defdefault` incurs no runtime overhead and compiles to simple `def`.
+  As such `defdefault` incurs no runtime overhead and compiles to a simple `def`.
 
   Of course `defdefault`s can accept arguments as any usual function:
 
