@@ -9,6 +9,22 @@ defmodule Knigge do
   `Knigge` can be `use`d directly in a behaviour, or in a separate module by
   passing the behaviour which should be "facaded" as an option.
 
+  ## Motivation
+
+  `Knigge` was born out of a desire to standardize dealing with behaviours and
+  their implementations.
+
+  As a great fan of [`mox`](https://github.com/plataformatec/mox), I longed for
+  an easy way to swap out implementations from the configuration which lead me
+  to introducing a facade pattern, where a module's sole responsibility was
+  loading the correct implementation and delegating calls.
+
+  This pattern turned out to be very flexible and useful but required a fair bit
+  of boilerplate code. `Knigge` was born out of an attempt to reduce this
+  boilerplate to the absolute minimum.
+
+  But see for yourself.
+
   ## Examples
 
   Imagine a behaviour looking like this:
@@ -51,6 +67,52 @@ defmodule Knigge do
           implementation: MyGreatImplementation
       end
 
+  ### `defdefault` - Fallback implementations for optional callbacks
+
+  Now imagine you have a more sophisticated behaviour with some optional callbacks:
+
+      defmodule MySophisticatedBehaviour do
+        @callback an_optional_callback() :: any()
+        @callback a_required_callback() :: any()
+
+        @optional_callbacks an_optional_callback: 0
+      end
+
+  As you would expect `Knigge` delegates calls to this callback as usual. But
+  since it's optional this delegation might fail. A common pattern is to check
+  if the implementation exports the function in question:
+
+      if function_exported?(MyImplementation, :an_optional_callback, 0) do
+        MyImplementation.an_optional_callback()
+      else
+        :my_fallback_implementation
+      end
+
+  `Knigge` offers an easy way to specify these fallback implementations with
+  `defdefault`:
+
+      defmodule MySophisticatedFacade do
+        use Knigge,
+          behaviour: MySophisticatedBehaviour,
+          otp_app: :my_application
+
+        defdefault an_optional_callback do
+          :my_fallback_implementation
+        end
+      end
+
+  `Knigge` tries to determine at compile-time if the implementation exports
+  the function in question and only uses the default if this is not the case.
+  As such `defdefault` incurs no runtime overhead and compiles to simple `def`.
+
+  Of course `defdefault`s can accept arguments as any usual function:
+
+      defdefault my_optional_callback_with_arguments(first_argument, another_argument) do
+        case first_argument do
+          # ...
+        end
+      end
+
   ## Options
 
   `Knigge` expects either the `otp_app` key or the `implementation` key. If
@@ -63,7 +125,7 @@ defmodule Knigge do
   By default `Knigge` does as much work as possible at compile time. This will
   be fine most of the time. In case you want to swap out the implementation at
   runtime - by calling `Application.put_env/2` - you can force `Knigge` to do all
-  delegation at runtime. As you might expect this impacts runtime speed negatively,
+  delegation at runtime. As you might expect this incurs runtime overhead,
   since the implementing module will have to be loaded for each call.
 
   If you want to do delegation at runtime simply pass `delegate_at: :runtime` as
