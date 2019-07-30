@@ -117,8 +117,9 @@ defmodule Knigge.Code do
   end
 
   defp get_defaults(defaults, callback) do
-    for {^callback, default} <- defaults, reduce: [] do
-      defaults -> [default | defaults]
-    end
+    defaults
+    |> Enum.filter(&match?({^callback, _}, &1))
+    |> Enum.map(fn {_, default} -> default end)
+    |> Enum.reverse()
   end
 end
