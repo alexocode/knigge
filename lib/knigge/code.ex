@@ -36,6 +36,7 @@ defmodule Knigge.Code do
     generate(module, env)
   end
 
+  # TODO: Refactor this into a separate module and pass in the arguments as a struct to make it more easily testable
   def generate(module, env) do
     behaviour = get_behaviour(module, env)
     callbacks = get_callbacks(behaviour)
