@@ -53,17 +53,19 @@ defmodule Knigge.Code do
         callback in definitions ->
           Warn.definition_matching_callback(module, callback)
 
-        Map.has_key?(defaults, callback) ->
+        has_default?(defaults, callback) ->
           unless callback in optional_callbacks do
             Error.default_for_required_callback!(env)
           end
 
-          Default.callback_to_defdefault(callback,
-            from: module,
-            default: defaults[callback],
-            delegate_at: delegate_at,
-            env: env
-          )
+          for default <- get_defaults(defaults, callback) do
+            Default.callback_to_defdefault(callback,
+              from: module,
+              default: default,
+              delegate_at: delegate_at,
+              env: env
+            )
+          end
 
         true ->
           Delegate.callback_to_defdelegate(callback,
@@ -105,6 +107,17 @@ defmodule Knigge.Code do
     module
     |> Module.get_attribute(:__knigge__)
     |> Keyword.get_values(:defdefault)
-    |> Map.new()
+  end
+
+  defp has_default?(defaults, callback) do
+    default = Enum.find(defaults, &match?({^callback, _}, &1))
+
+    not is_nil(default)
+  end
+
+  defp get_defaults(defaults, callback) do
+    for {^callback, default} <- defaults, reduce: [] do
+      defaults -> [default | defaults]
+    end
   end
 end

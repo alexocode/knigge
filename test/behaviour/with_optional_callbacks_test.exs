@@ -152,4 +152,25 @@ defmodule Behaviour.WithOptionalCallbacksTest do
 
     assert :my_great_implementation == facade.my_required_callback()
   end
+
+  test "generates multiple defdefaults when multiple are defined" do
+    %{facade: facade} =
+      define_facade_with_mock skip_optional_callbacks: [my_optional_function_with_arguments: 2] do
+        defdefault my_optional_function_with_arguments(:atom, _arg2) do
+          :atom_was_matched
+        end
+
+        defdefault my_optional_function_with_arguments(42, arg2) do
+          arg2
+        end
+
+        defdefault my_optional_function_with_arguments(arg1, arg2) do
+          [arg1, arg2]
+        end
+      end
+
+    assert :atom_was_matched == facade.my_optional_function_with_arguments(:atom, :whatever)
+    assert "second argument" == facade.my_optional_function_with_arguments(42, "second argument")
+    assert [3, 14] == facade.my_optional_function_with_arguments(3, 14)
+  end
 end
