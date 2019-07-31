@@ -13,7 +13,7 @@ Opinionated means that it offers an easy way of defining a "facade" for a
 behaviour. This facade then delegates calls to the real implementation, which
 is either given directly to `Knigge` or fetched from the configuration.
 
-`Knigge` can be `use`d directly in a behaviour, or in a separate module by
+`Knigge` can be `used` directly in a behaviour, or in a separate module by
 passing the behaviour which should be "facaded" as an option.
 
 [See the documentation](https://hexdocs.pm/knigge) for more information.
