@@ -14,16 +14,16 @@ defmodule Knigge do
   `Knigge` was born out of a desire to standardize dealing with behaviours and
   their implementations.
 
-  As a great fan of [`mox`](https://github.com/plataformatec/mox) I longed for
-  an easy way to swap out implementations from the configuration which lead me
-  to introducing a facade pattern, where a module's sole responsibility was
+  As great fans of [`mox`](https://github.com/plataformatec/mox) we longed for
+  an easy way to swap out implementations from the configuration which lead us
+  to introduce a facade pattern, where a module's sole responsibility was
   loading the correct implementation and delegating calls.
 
   This pattern turned out to be very flexible and useful but required a fair bit
   of boilerplate code. `Knigge` was born out of an attempt to reduce this
   boilerplate to the absolute minimum.
 
-  But see for yourself.
+  You can read about our motivation in depth [in our devblog](https://dev.betterdoc.org/elixir/friday_project/behaviour/2019/07/30/how-we-deal-with-behaviours-and-boilerplate.html).
 
   ## Examples
 
