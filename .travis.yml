@@ -22,7 +22,7 @@ stages:
   - name: test
     if: NOT branch =~ ^wip/
   - name: docs
-    if: branch = master AND type != push AND fork = false
+    if: branch = master AND type = push AND fork = false
   - name: publish
     if: tag =~ ^v
 
