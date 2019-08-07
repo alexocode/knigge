@@ -11,9 +11,11 @@ defmodule Knigge.Module do
     module
   end
 
-  def exists?(_module, %Options{check_if_exists?: false}), do: true
-
-  def exists?(module, %Options{check_if_exists?: true}) do
-    Code.ensure_loaded?(module) or Module.open?(module)
+  def exists?(module, opts) do
+    if Options.check_if_exists?(opts) do
+      Code.ensure_loaded?(module) or Module.open?(module)
+    else
+      true
+    end
   end
 end

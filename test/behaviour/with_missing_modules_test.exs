@@ -17,14 +17,36 @@ defmodule Behaviour.WithMissingModulesTest do
   test "raises a CompileError when the Implementation does not exist" do
     assert_raise CompileError,
                  ~r"the given module could not be found: DoesNotExist",
-                 fn -> define_facade(behaviour: Behaviour, implementation: DoesNotExist) end
+                 fn ->
+                   define_facade(
+                     behaviour: Behaviour,
+                     implementation: DoesNotExist,
+                     check_if_exists: :test
+                   )
+                 end
   end
 
   test "raises a CompileError when the Behaviour does not exist" do
     assert_raise CompileError,
                  ~r"the given module could not be found: MissingBehaviour",
                  fn ->
-                   define_facade(behaviour: MissingBehaviour, implementation: Implementation)
+                   define_facade(
+                     behaviour: MissingBehaviour,
+                     implementation: Implementation,
+                     check_if_exists: [except: :dev]
+                   )
+                 end
+  end
+
+  test "raises a CompileError when both don't exist and `only: [:test, :dev]` is passed for existence check" do
+    assert_raise CompileError,
+                 ~r"the given module could not be found: DoesNotExist",
+                 fn ->
+                   define_facade(
+                     behaviour: Behaviour,
+                     implementation: DoesNotExist,
+                     check_if_exists: [only: [:test, :dev]]
+                   )
                  end
   end
 

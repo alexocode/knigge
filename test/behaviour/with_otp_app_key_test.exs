@@ -21,8 +21,7 @@ defmodule Behaviour.WithOtpAppKey do
       defmodule_salted WorkingBehaviour do
         use Knigge,
           otp_app: :knigge,
-          config_key: :working_behaviour,
-          check_if_exists?: false
+          config_key: :working_behaviour
       end
 
     Application.delete_env(:knigge, :working_behaviour)
@@ -35,9 +34,7 @@ defmodule Behaviour.WithOtpAppKey do
 
     # Should not raise
     defmodule AGreatBehaviour do
-      use Knigge,
-        otp_app: :knigge,
-        check_if_exists?: false
+      use Knigge, otp_app: :knigge
 
       @callback my_function(arg :: any()) :: no_return
     end
