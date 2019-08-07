@@ -80,7 +80,7 @@ defmodule Knigge.Options do
       |> validate!()
       |> with_defaults()
       |> Keyword.put_new_lazy(:implementation, fn ->
-        {:config, opts[:opt_app], opts[:config_key]}
+        {:config, opts[:otp_app], opts[:config_key]}
       end)
 
     struct(__MODULE__, opts)

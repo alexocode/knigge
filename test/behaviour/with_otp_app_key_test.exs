@@ -1,5 +1,5 @@
 defmodule Behaviour.WithOtpAppKey do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   import Knigge.Test.SaltedModule
 
@@ -21,8 +21,11 @@ defmodule Behaviour.WithOtpAppKey do
       defmodule_salted WorkingBehaviour do
         use Knigge,
           otp_app: :knigge,
-          config_key: :working_behaviour
+          config_key: :working_behaviour,
+          check_if_exists?: false
       end
+
+    Application.delete_env(:knigge, :working_behaviour)
 
     assert behaviour.__knigge__(:implementation) == SomeModule
   end
@@ -32,10 +35,14 @@ defmodule Behaviour.WithOtpAppKey do
 
     # Should not raise
     defmodule AGreatBehaviour do
-      use Knigge, otp_app: :knigge
+      use Knigge,
+        otp_app: :knigge,
+        check_if_exists?: false
 
       @callback my_function(arg :: any()) :: no_return
     end
+
+    Application.delete_env(:knigge, __MODULE__.AGreatBehaviour)
 
     Mox.defmock(AGreatBehaviourMock, for: AGreatBehaviour)
     Mox.expect(AGreatBehaviourMock, :my_function, fn arg -> send self(), {:argument, arg} end)
