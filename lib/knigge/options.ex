@@ -22,9 +22,10 @@ defmodule Knigge.Options do
 
   - `behaviour` the behaviour for which `Knigge` should generate delegations,
     defaults to the `use`ing `__MODULE__`
-  - `check_if_exists` controls how `Knigge` checks if the given modules exist by env,
-    accepts a boolean, `[only: ...]` or `[except: ...]` with a single atom, or list of atoms,
-    assumes `only` if an atom or a list of atoms is passed directly,
+  - `check_if_exists` controls how `Knigge` checks if the given modules exist,
+    accepts a boolean, one or many environment names (atom or list of atoms),
+    or `[only: <envs>]` - only checks in the given environments, equivalent to passing them directly -
+    and `[except: <envs>]` - only checks if the environment is not in the given list -
     defaults to `[except: :test]`
   - `config_key` the configuration key from which `Knigge` should fetch the implementation,
     defaults to the `use`ing `__MODULE__` and is only used when `otp_app` is passed
