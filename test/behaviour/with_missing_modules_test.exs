@@ -54,6 +54,14 @@ defmodule Behaviour.WithMissingModulesTest do
     define_facade(behaviour: Behaviour, implementation: Implementation)
   end
 
+  test "does not raise any error when the implementation is missing but check_if_exists is set to false" do
+    define_facade(
+      behaviour: Behaviour,
+      implementation: MissingImplementation,
+      check_if_exists: false
+    )
+  end
+
   defp define_facade(opts) do
     defmodule_salted Facade do
       use Knigge, opts
