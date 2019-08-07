@@ -22,6 +22,10 @@ defmodule Knigge.Options do
 
   - `behaviour` the behaviour for which `Knigge` should generate delegations,
     defaults to the `use`ing `__MODULE__`
+  - `check_if_exists` controls how `Knigge` checks if the given modules exist by env,
+    accepts a boolean, `[only: ...]` or `[except: ...]` with a single atom, or list of atoms,
+    assumes `only` if an atom or a list of atoms is passed directly,
+    defaults to `[except: :test]`
   - `config_key` the configuration key from which `Knigge` should fetch the implementation,
     defaults to the `use`ing `__MODULE__` and is only used when `otp_app` is passed
   - `delegate_at` an atom defining when delegation should happen, either `:compile_time` or `:runtime`,
@@ -37,6 +41,7 @@ defmodule Knigge.Options do
   @type required :: {:implementation, implementation()} | {:otp_app, otp_app()}
   @type optional :: [
           behaviour: behaviour(),
+          check_if_exists: check_if_exists(),
           config_key: config_key(),
           delegate_at: delegate_at(),
           do_not_delegate: do_not_delegate(),
@@ -44,6 +49,7 @@ defmodule Knigge.Options do
         ]
 
   @type behaviour :: module()
+  @type check_if_exists :: boolean() | envs() | [only: envs()] | [except: envs()]
   @type config_key :: atom()
   @type delegate_at :: :compile_time | :runtime
   @type do_not_delegate :: keyword(arity())
@@ -51,9 +57,12 @@ defmodule Knigge.Options do
   @type otp_app :: atom()
   @type warn :: boolean()
 
+  @type envs :: atom() | list(atom())
+
   @type t :: %__MODULE__{
           implementation: implementation() | {:config, otp_app(), config_key()},
           behaviour: behaviour(),
+          check_if_exists: check_if_exists(),
           delegate_at: delegate_at(),
           do_not_delegate: do_not_delegate(),
           warn: warn()
@@ -61,11 +70,10 @@ defmodule Knigge.Options do
 
   defstruct [
     :behaviour,
-    :check_if_exists?,
     :delegate_at,
+    :check_if_exists,
     :do_not_delegate,
     :implementation,
-    :config_key,
     :warn
   ]
 
@@ -82,12 +90,16 @@ defmodule Knigge.Options do
       |> Keyword.put_new_lazy(:implementation, fn ->
         {:config, opts[:otp_app], opts[:config_key]}
       end)
+      |> Keyword.update!(:check_if_exists, fn
+        [{key, envs}] -> [{key, List.wrap(envs)}]
+        envs -> [only: List.wrap(envs)]
+      end)
 
     struct(__MODULE__, opts)
   end
 
   @defaults [
-    check_if_exists?: true,
+    check_if_exists: [except: :test],
     delegate_at: :compile_time,
     do_not_delegate: [],
     warn: true
@@ -129,6 +141,9 @@ defmodule Knigge.Options do
       iex> Knigge.Options.validate!(otp_app: :knigge)
       [otp_app: :knigge]
 
+      iex> Knigge.Options.validate!(otp_app: :knigge, check_if_exists: [:test, :prod])
+      [otp_app: :knigge, check_if_exists: [:test, :prod]]
+
       iex> Knigge.Options.validate!(implementation: SomeModule, otp_app: :knigge)
       ** (ArgumentError) Knigge expects either the :implementation or the :otp_app option but both were given.
 
@@ -140,6 +155,9 @@ defmodule Knigge.Options do
 
       iex> Knigge.Options.validate!(otp_app: :knigge, delegate_at: :compailtime)
       ** (ArgumentError) Knigge received invalid value for `delegate_at`. Expected :compile_time or :runtime but received: :compailtime
+
+      iex> Knigge.Options.validate!(otp_app: :knigge, check_if_exists: "test")
+      ** (ArgumentError) Knigge received invalid value for `check_if_exists`. Expected boolean or environment (atom or list of atoms) but received: "test"
   """
   @spec validate!(raw()) :: no_return
   def validate!(opts) do
@@ -203,7 +221,7 @@ defmodule Knigge.Options do
 
   @option_types [
     behaviour: :module,
-    check_if_exists?: :boolean,
+    check_if_exists: :envs,
     delegate_at: [:compile_time, :runtime],
     do_not_delegate: :keyword,
     implementation: :module,
@@ -227,10 +245,21 @@ defmodule Knigge.Options do
   defp valid_value?(:module, value), do: is_atom(value)
   defp valid_value?(:keyword, value), do: Keyword.keyword?(value)
 
+  defp valid_value?(:envs, only: envs), do: valid_envs?(envs)
+  defp valid_value?(:envs, except: envs), do: valid_envs?(envs)
+  defp valid_value?(:envs, envs), do: valid_envs?(envs)
+
   defp valid_value?(values, value) when is_list(values), do: value in values
+
+  defp valid_envs?(envs) do
+    is_boolean(envs) or is_atom(envs) or (is_list(envs) and Enum.all?(envs, &is_atom/1))
+  end
 
   defp expected_value(name) do
     case Keyword.fetch!(@option_types, name) do
+      :envs ->
+        "boolean or environment (atom or list of atoms)"
+
       :keyword ->
         "keyword list"
 
@@ -244,5 +273,11 @@ defmodule Knigge.Options do
     end
   end
 
-  def check_if_exists?(opts), do: Keyword.get(opts, :check_if_exists?, true)
+  @env Mix.env()
+
+  def check_if_exists?(%__MODULE__{check_if_exists: envs}), do: do_check_if_exists?(envs)
+
+  defp do_check_if_exists?(boolean) when is_boolean(boolean), do: boolean
+  defp do_check_if_exists?(only: envs), do: @env in envs
+  defp do_check_if_exists?(except: envs), do: @env not in envs
 end
