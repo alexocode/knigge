@@ -9,11 +9,7 @@ defmodule Behaviour.WithAlreadyExistingImplementationTest do
   defmacrop define_facade(knigge_options \\ []) do
     behaviour = salt_atom(Behaviour)
     implementation = salt_atom(Implementation)
-
-    options =
-      knigge_options
-      |> Keyword.put(:implementation, implementation)
-      |> Keyword.put(:check_if_exists?, false)
+    options = Keyword.put(knigge_options, :implementation, implementation)
 
     quote bind_quoted: [behaviour: behaviour, implementation: implementation], unquote: true do
       warnings =
