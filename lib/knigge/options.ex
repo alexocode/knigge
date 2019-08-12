@@ -94,9 +94,10 @@ defmodule Knigge.Options do
 
   defstruct [
     :behaviour,
-    :delegate_at,
     :check_if_exists,
+    :delegate_at,
     :do_not_delegate,
+    :env,
     :implementation,
     :warn
   ]
@@ -141,7 +142,9 @@ defmodule Knigge.Options do
   """
   @spec with_defaults(raw()) :: raw()
   def with_defaults(opts) do
-    Keyword.merge(@defaults, opts)
+    @defaults
+    |> Keyword.put(:env, Mix.env())
+    |> Keyword.merge(opts)
   end
 
   @doc """
@@ -297,11 +300,9 @@ defmodule Knigge.Options do
     end
   end
 
-  @env Mix.env()
+  def check_if_exists?(%__MODULE__{check_if_exists: envs, env: env}), do: do_check_if_exists?(env, envs)
 
-  def check_if_exists?(%__MODULE__{check_if_exists: envs}), do: do_check_if_exists?(envs)
-
-  defp do_check_if_exists?(boolean) when is_boolean(boolean), do: boolean
-  defp do_check_if_exists?(only: envs), do: @env in envs
-  defp do_check_if_exists?(except: envs), do: @env not in envs
+  defp do_check_if_exists?(_env, boolean) when is_boolean(boolean), do: boolean
+  defp do_check_if_exists?(env, only: envs), do: env in envs
+  defp do_check_if_exists?(env, except: envs), do: env not in envs
 end
