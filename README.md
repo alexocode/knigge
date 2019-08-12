@@ -20,6 +20,14 @@ passing the behaviour which should be "facaded" as an option.
 
 [See the documentation](https://hexdocs.pm/knigge) for more information.
 
+## Overview
+
+- [Installation](#installation)
+- [Motivation](#motivation)
+- [Examples](#examples)
+- [Options](#options)
+- [Knigge and Compiler Warnings](#knigge-and-compiler-warnings)
+
 ## Installation
 
 Simply add `knigge` to your list of dependencies in your `mix.exs`:
@@ -186,3 +194,44 @@ If you want to do delegation at runtime simply pass `delegate_at: :runtime` as
 option.
 
 For further information about options check the [`Knigge.Options` module](https://hexdocs.pm/knigge/Knigge.Options.html).
+
+## Knigge and Compiler Warnings
+
+By default `Knigge` does not check if the given implementation exists in your `:test`
+environment. While this enables you to define the implementation more flexibly
+(for example with `mox`) it also generates a bunch of compiler warnings:
+
+```
+warning: function MyMock.my_great_callback/1 is undefined (module MyMock is not available)
+  lib/my_facade.ex:1
+
+warning: function MyMock.another_callback/0 is undefined (module MyMock is not available)
+  lib/my_facade.ex:1
+```
+
+This can quickly become quite unnerving. Until Elixir 1.10 hits the scene (which introduces
+compiler directives to disable this warning on a per-module basis) you can explicitly tell
+the compiler to ignore this module in your `mix.exs` file.
+
+To disable the check simply add the following line to your `mix.exs` function:
+
+```elixir
+def project do
+  [
+    # ...
+    xref: [exclude: [MyMock]]
+  ]
+end
+```
+
+Where `MyMock` is the name of your configured module in question.
+
+Alternatively you could tell `Knigge` to `delegate_at` `runtime` in your `:test` environment:
+
+```elixir
+use Knigge,
+  otp_app: :my_app,
+  delegate_at: if Mix.env() == :test, do: :runtime, else: :compile_time
+```
+
+By moving delegation to `runtime` for `:test` you give the compiler no opportunity to scream at you.
