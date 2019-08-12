@@ -213,7 +213,7 @@ This can quickly become quite unnerving. Until Elixir 1.10 hits the scene (which
 compiler directives to disable this warning on a per-module basis) you can explicitly tell
 the compiler to ignore this module in your `mix.exs` file.
 
-To disable the check simply add the following line to your `mix.exs` function:
+To disable the check simply add a single line to your `mix.exs`' `project/0` function:
 
 ```elixir
 def project do
