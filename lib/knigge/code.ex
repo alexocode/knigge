@@ -41,7 +41,7 @@ defmodule Knigge.Code do
     behaviour = get_behaviour(module, env)
     callbacks = get_callbacks(behaviour)
     optional_callbacks = get_optional_callbacks(behaviour)
-    delegate_at = get_option(module, :delegate_at)
+    delegate_at_runtime? = get_option(module, :delegate_at_runtime?)
     do_not_delegate = get_option(module, :do_not_delegate)
     definitions = get_definitions(module)
     defaults = get_defaults(module)
@@ -63,7 +63,7 @@ defmodule Knigge.Code do
             Default.callback_to_defdefault(callback,
               from: module,
               default: default,
-              delegate_at: delegate_at,
+              delegate_at_runtime?: delegate_at_runtime?,
               env: env
             )
           end
@@ -71,7 +71,7 @@ defmodule Knigge.Code do
         true ->
           Delegate.callback_to_defdelegate(callback,
             from: module,
-            delegate_at: delegate_at,
+            delegate_at_runtime?: delegate_at_runtime?,
             env: env
           )
       end
