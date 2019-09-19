@@ -190,16 +190,26 @@ runtime - by calling `Application.put_env/2` - you can force `Knigge` to do all
 delegation at runtime. As you might expect this incurs runtime overhead,
 since the implementing module will have to be loaded for each call.
 
-If you want to do delegation at runtime simply pass `delegate_at: :runtime` as
-option.
+If you want to do delegation at runtime simply pass `delegate_at_runtime?: true`
+as option - by default `Knigge` delegates at runtime in your `:test`s.
 
 For further information about options check the [`Knigge.Options` module](https://hexdocs.pm/knigge/Knigge.Options.html).
 
-## Knigge and Compiler Warnings
+## Knigge and the `:test` environment
 
-By default `Knigge` does not check if the given implementation exists in your `:test`
-environment. While this enables you to define the implementation more flexibly
-(for example with `mox`) it also generates a bunch of compiler warnings:
+To give the maximum amount of flexibility `Knigge` delegates at runtime in your
+`:test` environment and at compile time everywhere else.
+
+This allows you to easily swap out your behaviour implementation - for example by
+calling `Application.put_env/3` - and it also avoids a bunch of compiler warnings.
+
+### Compiler Warnings
+
+With the default configuration `Knigge` does not generate any compiler warnings.
+
+In case you change the `delegate_at_runtime?` configuration to anything which
+excludes the `:test` environment you will - most likely - encounter compiler
+warnings like this:
 
 ```
 warning: function MyMock.my_great_callback/1 is undefined (module MyMock is not available)
@@ -209,9 +219,8 @@ warning: function MyMock.another_callback/0 is undefined (module MyMock is not a
   lib/my_facade.ex:1
 ```
 
-This can quickly become quite unnerving. Until Elixir 1.10 hits the scene (which introduces
-compiler directives to disable this warning on a per-module basis) you can explicitly tell
-the compiler to ignore this module in your `mix.exs` file.
+This can quickly become quite unnerving. Luckily you can explicitly tell the
+compiler to ignore this module in your `mix.exs` file.
 
 To disable the check simply add a single line to your `mix.exs`' `project/0` function:
 
@@ -225,13 +234,3 @@ end
 ```
 
 Where `MyMock` is the name of your configured module in question.
-
-Alternatively you could tell `Knigge` to `delegate_at` `runtime` in your `:test` environment:
-
-```elixir
-use Knigge,
-  otp_app: :my_app,
-  delegate_at: if Mix.env() == :test, do: :runtime, else: :compile_time
-```
-
-By moving delegation to `runtime` for `:test` you give the compiler no opportunity to scream at you.
