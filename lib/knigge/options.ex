@@ -143,7 +143,7 @@ defmodule Knigge.Options do
   end
 
   defp map_deprecated(opts) when is_list(opts) do
-    for {key, value} = kv <- opts do
+    for {key, _} = kv <- opts do
       case map_deprecated(kv) do
         ^kv ->
           kv
@@ -346,22 +346,8 @@ defmodule Knigge.Options do
       :keyword ->
         "keyword list"
 
-      list when is_list(list) ->
-        list
-        |> Enum.map(&inspect/1)
-        |> Enum.join(" or ")
-
       other ->
         to_string(other)
-    end
-  end
-
-  @spec delegate_at(t()) :: :compile_time | :runtime
-  def delegate_at(%__MODULE__{delegate_at_runtime?: delegate_at_runtime?}) do
-    if delegate_at_runtime? do
-      :runtime
-    else
-      :compile_time
     end
   end
 end
