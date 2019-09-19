@@ -3,14 +3,14 @@ defmodule Knigge.Code.Delegate do
 
   alias Knigge.Implementation
 
-  def callback_to_defdelegate({name, arity}, from: module, delegate_at: :compile_time, env: env) do
+  def callback_to_defdelegate({name, arity}, from: module, delegate_at_runtime?: false, env: env) do
     callback_to_defdelegate({name, arity},
       from: module,
       to: Implementation.fetch_for!(module, env)
     )
   end
 
-  def callback_to_defdelegate({name, arity}, from: _module, delegate_at: :runtime, env: _env) do
+  def callback_to_defdelegate({name, arity}, from: _module, delegate_at_runtime?: true, env: _env) do
     quote bind_quoted: [name: name, arity: arity] do
       args = Macro.generate_arguments(arity, __MODULE__)
 

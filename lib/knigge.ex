@@ -214,21 +214,19 @@ defmodule Knigge do
       def __knigge__(:behaviour), do: unquote(behaviour)
       def __knigge__(:options), do: @__knigge__[:options]
 
-      case options.delegate_at do
-        :compile_time ->
-          implementation =
-            options
-            |> Knigge.Implementation.fetch!()
-            |> Knigge.Module.ensure_exists!(options, __ENV__)
+      if options.delegate_at_runtime? do
+        def __knigge__(:implementation) do
+          Knigge.Implementation.fetch!(__knigge__(:options))
+        end
+      else
+        implementation =
+          options
+          |> Knigge.Implementation.fetch!()
+          |> Knigge.Module.ensure_exists!(options, __ENV__)
 
-          def __knigge__(:implementation) do
-            unquote(implementation)
-          end
-
-        :runtime ->
-          def __knigge__(:implementation) do
-            Knigge.Implementation.fetch!(__knigge__(:options))
-          end
+        def __knigge__(:implementation) do
+          unquote(implementation)
+        end
       end
     end
   end

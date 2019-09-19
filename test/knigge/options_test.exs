@@ -1,5 +1,29 @@
 defmodule Knigge.OptionsTest do
   use ExUnit.Case, async: true
 
-  doctest Knigge.Options
+  import ExUnit.CaptureIO
+
+  alias Knigge.Options
+
+  doctest Options
+
+  test "using `check_if_exists` prints a deprecation warning" do
+    warnings = capture_io(:stderr, fn -> valid_opts(check_if_exists: true) end)
+
+    assert warnings =~
+             "Knigge encountered the deprecated option `check_if_exists`, please use `check_if_exists?`."
+  end
+
+  test "using `delegate_at` prints a deprecation warning" do
+    warnings = capture_io(:stderr, fn -> valid_opts(delegate_at: :runtime) end)
+
+    assert warnings =~
+             "Knigge encountered the deprecated option `delegate_at`, please use `delegate_at_runtime?`."
+  end
+
+  defp valid_opts(opts) do
+    [behaviour: SomeModule, implementation: AnotherModule]
+    |> Keyword.merge(opts)
+    |> Options.new()
+  end
 end

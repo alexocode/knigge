@@ -21,7 +21,7 @@ defmodule Behaviour.WithMissingModulesTest do
                    define_facade(
                      behaviour: Behaviour,
                      implementation: DoesNotExist,
-                     check_if_exists: :test
+                     check_if_exists?: :test
                    )
                  end
   end
@@ -33,7 +33,7 @@ defmodule Behaviour.WithMissingModulesTest do
                    define_facade(
                      behaviour: MissingBehaviour,
                      implementation: Implementation,
-                     check_if_exists: [except: :dev]
+                     check_if_exists?: [except: :dev]
                    )
                  end
   end
@@ -45,7 +45,7 @@ defmodule Behaviour.WithMissingModulesTest do
                    define_facade(
                      behaviour: Behaviour,
                      implementation: DoesNotExist,
-                     check_if_exists: [only: [:test, :dev]]
+                     check_if_exists?: [only: [:test, :dev]]
                    )
                  end
   end
@@ -58,7 +58,7 @@ defmodule Behaviour.WithMissingModulesTest do
     define_facade(
       behaviour: Behaviour,
       implementation: MissingImplementation,
-      check_if_exists: false
+      check_if_exists?: false
     )
   end
 

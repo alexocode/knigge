@@ -57,13 +57,13 @@ defmodule Behaviour.WithDefdefaultForOpenModuleTest do
            this enables to compiler to finish compilation of `#{inspect(implementation)}` before compiling `#{
         inspect(facade)
       }`
-        2. pass `delegate_at: :runtime` as option, this will move **all** delegation to runtime
+        2. pass `delegate_at_runtime?: true` as option, this will move **all** delegation to runtime
       """
     )
   end
 
-  test "does not print a warning when `delegate_at: :runtime` is passed" do
-    %{warnings: warnings} = define_facade(delegate_at: :runtime)
+  test "does not print a warning when `delegate_at_runtime?: true` is passed" do
+    %{warnings: warnings} = define_facade(delegate_at_runtime?: true)
 
     assert warnings == ""
   end

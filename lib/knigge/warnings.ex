@@ -30,7 +30,7 @@ defmodule Knigge.Warnings do
          this enables to compiler to finish compilation of `#{inspect(implementation)}` before compiling `#{
       inspect(module)
     }`
-      2. pass `delegate_at: :runtime` as option, this will move **all** delegation to runtime
+      2. pass `delegate_at_runtime?: true` as option, this will move **all** delegation to runtime
     """)
   end
 

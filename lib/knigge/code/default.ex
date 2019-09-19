@@ -9,7 +9,7 @@ defmodule Knigge.Code.Default do
         {name, arity},
         from: module,
         default: {args, block},
-        delegate_at: :compile_time,
+        delegate_at_runtime?: false,
         env: env
       ) do
     implementation = Implementation.fetch_for!(module, env)
@@ -26,7 +26,7 @@ defmodule Knigge.Code.Default do
           {name, arity},
           from: module,
           default: {args, block},
-          delegate_at: :runtime,
+          delegate_at_runtime?: true,
           env: env
         )
 
@@ -48,7 +48,7 @@ defmodule Knigge.Code.Default do
         {name, arity},
         from: _module,
         default: {args, block},
-        delegate_at: :runtime,
+        delegate_at_runtime?: true,
         env: _env
       ) do
     quote do
