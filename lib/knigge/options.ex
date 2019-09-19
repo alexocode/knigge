@@ -143,7 +143,17 @@ defmodule Knigge.Options do
   end
 
   defp map_deprecated(opts) when is_list(opts) do
-    Enum.map(opts, &map_deprecated/1)
+    for {key, value} = kv <- opts do
+      case map_deprecated(kv) do
+        ^kv ->
+          kv
+
+        {new_key, _} = kv ->
+          IO.warn("Knigge encountered the deprecated option `#{key}`, please use `#{new_key}`.")
+
+          kv
+      end
+    end
   end
 
   # TODO: Log deprecated
