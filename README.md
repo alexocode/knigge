@@ -35,7 +35,7 @@ Simply add `knigge` to your list of dependencies in your `mix.exs`:
 ```elixir
 def deps do
   [
-    {:knigge, "~> 1.0"}
+    {:knigge, "~> 1.1"}
   ]
 end
 ```
