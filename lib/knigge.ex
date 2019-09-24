@@ -180,7 +180,7 @@ defmodule Knigge do
 
   @type key :: :behaviour | :implementation | :options
 
-  @spec __using__(Knigge.Options.t()) :: no_return
+  @spec __using__(Knigge.Options.raw()) :: no_return
   defmacro __using__(options) do
     quote bind_quoted: [options: options] do
       import Knigge.Code, only: [defdefault: 2]
