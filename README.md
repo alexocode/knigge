@@ -26,7 +26,7 @@ passing the behaviour which should be "facaded" as an option.
 - [Motivation](#motivation)
 - [Examples](#examples)
 - [Options](#options)
-- [Knigge and Compiler Warnings](#knigge-and-compiler-warnings)
+- [Knigge and the `:test` environment](#knigge-and-the-test-environment)
 
 ## Installation
 
