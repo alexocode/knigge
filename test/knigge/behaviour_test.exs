@@ -17,5 +17,18 @@ defmodule Knigge.BehaviourTest do
         assert Knigge.Behaviour.callbacks(__MODULE__) == [my_great_function: 1]
       end
     end
+
+    test "with duplicated callbacks" do
+      defmodule DuplicatedBehaviour do
+        @callback my_function(String.t()) :: no_return
+        @callback my_function(atom()) :: no_return
+        @optional_callbacks my_function: 1
+        assert Knigge.Behaviour.callbacks(__MODULE__) == [my_function: 1]
+        assert Knigge.Behaviour.optional_callbacks(__MODULE__) == [my_function: 1]
+      end
+
+      assert Knigge.Behaviour.callbacks(DuplicatedBehaviour) == [my_function: 1]
+      assert Knigge.Behaviour.optional_callbacks(DuplicatedBehaviour) == [my_function: 1]
+    end
   end
 end

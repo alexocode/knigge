@@ -31,6 +31,7 @@ defmodule Knigge.Behaviour do
     module
     |> Module.get_attribute(:callback)
     |> Enum.map(&Knigge.AST.function_spec_from_callback/1)
+    |> Enum.uniq()
   end
 
   def optional_callbacks(module) do
