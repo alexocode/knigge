@@ -202,6 +202,10 @@ defmodule Knigge do
 
       @__knigge__ {:options, options}
 
+      @doc "Acts as a \"flag\" to mark this module as a Knigge module."
+      @spec __knigge__() :: :ok
+      def __knigge__, do: :ok
+
       @doc "Access Knigge internal values, such as the implementation being delegated to etc."
       @spec __knigge__(:behaviour) :: module()
       @spec __knigge__(:implementation) :: module()
