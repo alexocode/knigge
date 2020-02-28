@@ -1,6 +1,5 @@
 defmodule Knigge.Options do
   @defaults [
-    check_if_exists?: true,
     delegate_at_runtime?: [only: :test],
     do_not_delegate: [],
     warn: true
@@ -31,18 +30,6 @@ defmodule Knigge.Options do
   The behaviour for which `Knigge` should generate delegations.
 
   __Default__: the `use`ing `__MODULE__`.
-
-  ### `check_if_exists?`
-  Controls how `Knigge` checks if the given modules exist, accepts:
-
-  - a boolean (turn the check fully on or off)
-  - one or many environment names (atom or list of atoms) - only checks in the given environments
-  - `[only: <envs>]` - equivalent to the option above
-  - `[except: <envs>]` - only checks if the current environment is __not__ contained in the list
-
-  __Default__: `Application.gev_env(:knigge, :check_if_exists?, #{
-    inspect(@defaults[:check_if_exists?])
-  })`
 
   ### `config_key`
   The configuration key from which `Knigge` should fetch the implementation.
@@ -83,7 +70,6 @@ defmodule Knigge.Options do
   @type optional :: [
           behaviour: behaviour(),
           config_key: config_key(),
-          check_if_exists?: boolean_or_envs(),
           delegate_at_runtime?: boolean_or_envs(),
           do_not_delegate: do_not_delegate(),
           warn: warn()
@@ -101,7 +87,6 @@ defmodule Knigge.Options do
   @type t :: %__MODULE__{
           implementation: module() | {:config, otp_app(), config_key()},
           behaviour: behaviour(),
-          check_if_exists?: boolean(),
           delegate_at_runtime?: boolean(),
           do_not_delegate: do_not_delegate(),
           warn: warn()
@@ -109,7 +94,6 @@ defmodule Knigge.Options do
 
   defstruct [
     :behaviour,
-    :check_if_exists?,
     :delegate_at_runtime?,
     :do_not_delegate,
     :implementation,
@@ -143,21 +127,33 @@ defmodule Knigge.Options do
   end
 
   defp map_deprecated(opts) when is_list(opts) do
-    for {key, _} = kv <- opts do
+    opts
+    |> Enum.map(fn {key, _} = kv ->
       case map_deprecated(kv) do
         ^kv ->
           kv
 
-        {new_key, _} = kv ->
+        {new_key, _} = kv when is_atom(new_key) ->
           IO.warn("Knigge encountered the deprecated option `#{key}`, please use `#{new_key}`.")
 
           kv
+
+        message when is_binary(message) ->
+          IO.warn(
+            "Knigge encountered the deprecated option `#{key}`, this option is no longer supported; #{
+              message
+            }."
+          )
+
+          nil
       end
-    end
+    end)
+    |> Enum.reject(&is_nil/1)
   end
 
-  # TODO: Log deprecated
-  defp map_deprecated({:check_if_exists, value}), do: {:check_if_exists?, value}
+  defp map_deprecated({key, _})
+       when key in [:check_if_exists, :check_if_exists?],
+       do: "please use the mix task `mix knigge.verify`"
 
   defp map_deprecated({:delegate_at, :compile_time}), do: {:delegate_at_runtime?, false}
   defp map_deprecated({:delegate_at, :runtime}), do: {:delegate_at_runtime?, true}
@@ -187,7 +183,7 @@ defmodule Knigge.Options do
   defp defaults_from_config do
     :knigge
     |> Application.get_all_env()
-    |> Keyword.take([:check_if_exists?, :delegate_at_runtime?, :warn])
+    |> Keyword.take([:delegate_at_runtime?, :warn])
   end
 
   defp transform(opts, with_env: env) when is_list(opts) do
@@ -195,7 +191,7 @@ defmodule Knigge.Options do
   end
 
   defp transform(key, envs, with_env: env)
-       when key in [:check_if_exists?, :delegate_at_runtime?],
+       when key in [:delegate_at_runtime?],
        do: active_env?(env, envs)
 
   defp transform(_key, value, with_env: _), do: value
@@ -226,9 +222,6 @@ defmodule Knigge.Options do
       iex> Knigge.Options.validate!(otp_app: :knigge)
       [otp_app: :knigge]
 
-      iex> Knigge.Options.validate!(otp_app: :knigge, check_if_exists?: [:test, :prod])
-      [otp_app: :knigge, check_if_exists?: [:test, :prod]]
-
       iex> Knigge.Options.validate!(implementation: SomeModule, otp_app: :knigge)
       ** (ArgumentError) Knigge expects either the :implementation or the :otp_app option but both were given.
 
@@ -240,9 +233,6 @@ defmodule Knigge.Options do
 
       iex> Knigge.Options.validate!(otp_app: :knigge, delegate_at_runtime?: "test")
       ** (ArgumentError) Knigge received invalid value for `delegate_at_runtime?`. Expected boolean or environment (atom or list of atoms) but received: "test"
-
-      iex> Knigge.Options.validate!(otp_app: :knigge, check_if_exists?: "test")
-      ** (ArgumentError) Knigge received invalid value for `check_if_exists?`. Expected boolean or environment (atom or list of atoms) but received: "test"
   """
   @spec validate!(raw()) :: no_return
   def validate!(opts) do
@@ -306,7 +296,6 @@ defmodule Knigge.Options do
 
   @option_types [
     behaviour: :module,
-    check_if_exists?: :envs,
     delegate_at_runtime?: :envs,
     do_not_delegate: :keyword,
     implementation: :module,
