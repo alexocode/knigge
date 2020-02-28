@@ -9,10 +9,9 @@ defmodule Knigge.Code.Default do
         {name, arity},
         from: module,
         default: {args, block},
-        delegate_at_runtime?: false,
-        env: env
+        delegate_at_runtime?: false
       ) do
-    implementation = Implementation.fetch_for!(module, env)
+    implementation = Implementation.fetch_for!(module)
 
     cond do
       Module.open?(implementation) ->
@@ -26,8 +25,7 @@ defmodule Knigge.Code.Default do
           {name, arity},
           from: module,
           default: {args, block},
-          delegate_at_runtime?: true,
-          env: env
+          delegate_at_runtime?: true
         )
 
       function_exported?(implementation, name, arity) ->
@@ -48,8 +46,7 @@ defmodule Knigge.Code.Default do
         {name, arity},
         from: _module,
         default: {args, block},
-        delegate_at_runtime?: true,
-        env: _env
+        delegate_at_runtime?: true
       ) do
     quote do
       def unquote(name)(unquote_splicing(args)) do
