@@ -144,7 +144,7 @@ defmodule Mix.Tasks.Knigge.Verify do
 
     facades
     |> Enum.map_join("\n", fn {module, implementation} ->
-      "  #{inspect(module)} -> #{inspect(implementation)}"
+      "  #{inspect(module)} -> #{inspect(implementation)} (implementation does not exist)"
     end)
     |> error()
   end
