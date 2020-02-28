@@ -13,9 +13,13 @@ defmodule Knigge.Module do
 
   def exists?(module, %Options{} = opts) do
     if opts.check_if_exists? do
-      Code.ensure_loaded?(module) or Module.open?(module)
+      exists?(module)
     else
       true
     end
+  end
+
+  def exists?(module) do
+    Module.open?(module) or Code.ensure_loaded?(module)
   end
 end
