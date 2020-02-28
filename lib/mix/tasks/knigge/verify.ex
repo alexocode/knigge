@@ -1,4 +1,4 @@
-defmodule Mix.Tasks.Knigge.EnsureExists do
+defmodule Mix.Tasks.Knigge.Verify do
   use Mix.Task
 
   import Knigge.CLI.Output
@@ -30,7 +30,7 @@ defmodule Mix.Tasks.Knigge.EnsureExists do
   defp calling_app, do: Mix.Project.get().project()[:app]
 
   defp begin(app) do
-    info("Verify Knigge implementations.", app: app)
+    info("Verify Knigge facades.", app: app)
 
     app
   end
