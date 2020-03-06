@@ -22,6 +22,21 @@ defmodule Knigge.Verification.Context do
 
   module = inspect(__MODULE__)
 
+  @doc """
+  Creates a new `#{module}` struct while setting the `began_at` to now.
+
+  ## Example
+
+      iex> context = #{module}.new()
+      iex> context.began_at <= #{module}.timestamp()
+      true
+
+      iex> context = #{module}.new(began_at: 123, app: :foobar)
+      iex> context.began_at
+      123
+      iex> context.app
+      :foobar
+  """
   @spec new() :: t()
   @spec new(params :: map() | Keyword.t()) :: t()
   def new(params \\ %{})
@@ -35,10 +50,10 @@ defmodule Knigge.Verification.Context do
   end
 
   defp with_defaults(params) do
-    Map.put_new(params, :began_at, current_millis())
+    Map.put_new(params, :began_at, timestamp())
   end
 
-  defp current_millis, do: :os.system_time(:millisecond)
+  def timestamp, do: :os.system_time(:millisecond)
 
   @doc """
   Loads the modules for the given app which `use Knigge`.
@@ -97,7 +112,7 @@ defmodule Knigge.Verification.Context do
 
       iex> context = %#{module}{finished_at: nil}
       iex> context = #{module}.finished(context)
-      iex> context.finished_at <= :os.system_time(:millisecond)
+      iex> context.finished_at <= #{module}.timestamp()
       true
 
       iex> context = %#{module}{finished_at: nil}
@@ -112,7 +127,7 @@ defmodule Knigge.Verification.Context do
   """
   @spec finished(t()) :: t()
   @spec finished(t(), milliseconds()) :: t()
-  def finished(%__MODULE__{} = context, finished_at \\ current_millis()) do
+  def finished(%__MODULE__{} = context, finished_at \\ timestamp()) do
     %__MODULE__{context | finished_at: finished_at}
   end
 
@@ -126,7 +141,7 @@ defmodule Knigge.Verification.Context do
       iex> #{module}.duration(context)
       10
 
-      iex> now = :os.system_time(:millisecond)
+      iex> now = #{module}.timestamp()
       iex> context = %#{module}{began_at: now - 100}
       iex> duration = #{module}.duration(context)
       iex> duration >= 100
@@ -134,7 +149,7 @@ defmodule Knigge.Verification.Context do
   """
   @spec duration(t()) :: milliseconds()
   def duration(%__MODULE__{began_at: began_at, finished_at: finished_at}) do
-    (finished_at || current_millis()) - began_at
+    (finished_at || timestamp()) - began_at
   end
 
   @doc """
