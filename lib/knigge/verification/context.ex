@@ -41,6 +41,54 @@ defmodule Knigge.Verification.Context do
   defp current_millis, do: :os.system_time(:millisecond)
 
   @doc """
+  Loads the modules for the given app which `use Knigge`.
+
+  Returns an error when the app does not exist or loading it fails.
+
+  ## Example
+
+      iex> {:ok, context} = #{module}.for_app(:knigge)
+      iex> context.app
+      :knigge
+      iex> context.modules
+      []
+
+      iex> context = %#{module}{began_at: 123}
+      iex> {:ok, context} = #{module}.for_app(context, :knigge)
+      iex> context.began_at
+      123
+      iex> context.app
+      :knigge
+      iex> context.modules
+      []
+
+      iex> #{module}.for_app(:does_not_exist)
+      {:error, {:unknown_app, :does_not_exist}}
+  """
+  @spec for_app(app :: atom()) :: {:ok, t()} | {:error, reason :: any()}
+  @spec for_app(t(), app :: atom()) :: {:ok, t()} | {:error, reason :: any()}
+  def for_app(context \\ new(), app)
+
+  def for_app(%__MODULE__{} = context, app) do
+    with :ok <- ensure_loaded(app),
+         {:ok, modules} <- Knigge.Module.fetch_for_app(app) do
+      {:ok, %__MODULE__{context | app: app, modules: modules}}
+    end
+  end
+
+  defp ensure_loaded(nil), do: {:error, {:unknown_app, nil}}
+
+  defp ensure_loaded(app) do
+    case Application.load(app) do
+      :ok -> :ok
+      {:error, {:already_loaded, ^app}} -> :ok
+      {:error, {'no such file or directory', _}} -> {:error, {:unknown_app, app}}
+      {:error, :undefined} -> {:error, {:unknown_app, app}}
+      other -> other
+    end
+  end
+
+  @doc """
   Sets the `finished_at` field to the given time in milliseconds.
 
   If none was given it uses the current time.
