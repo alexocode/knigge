@@ -3,25 +3,11 @@ defmodule Mix.Tasks.Knigge.Verify do
 
   import Knigge.CLI.Output
 
-  defmodule Context do
-    @moduledoc false
+  alias Knigge.Verification.Context
 
-    defstruct app: nil,
-              modules: [],
-              existing: [],
-              missing: [],
-              error: nil,
-              began_at: nil
-  end
+  require Context
 
   @recursive true
-
-  @exit_codes %{
-    unknown_app: 1,
-    missing_module: 2
-  }
-  @exit_reasons Map.keys(@exit_codes)
-  @unknown_error_code 64
 
   @impl Mix.Task
   def run(_args) do
@@ -37,28 +23,13 @@ defmodule Mix.Tasks.Knigge.Verify do
   end
 
   defp run_for(app) do
-    began_at = current_millis()
-
-    with {:ok, modules} <- fetch_modules_to_check(app) do
-      %Context{
-        app: calling_app(),
-        modules: modules,
-        began_at: began_at
-      }
-      |> begin()
+    with {:ok, context} <- Context.for_app(app) do
+      context
+      |> begin_verification()
       |> verify_implementations()
-      |> finish()
-    end
-  end
-
-  defp current_millis, do: :os.system_time(:millisecond)
-
-  defp fetch_modules_to_check(app) do
-    with :ok <- ensure_loaded(app),
-         {:ok, modules} <- Knigge.Module.fetch_for_app(app) do
-      {:ok, modules}
+      |> finish_verification()
     else
-      {:error, :undefined} ->
+      {:error, {:unknown_app, app}} ->
         error("Unable to load modules for #{app || "current app"}, are you sure the app exists?")
 
         {:error, :unknown_app}
@@ -68,18 +39,7 @@ defmodule Mix.Tasks.Knigge.Verify do
     end
   end
 
-  defp ensure_loaded(nil), do: {:error, :undefined}
-
-  defp ensure_loaded(app) do
-    case Application.load(app) do
-      :ok -> :ok
-      {:error, {:already_loaded, ^app}} -> :ok
-      {:error, {'no such file or directory', _}} -> {:error, :undefined}
-      other -> other
-    end
-  end
-
-  defp begin(%Context{app: app, modules: modules} = context) do
+  defp begin_verification(%Context{app: app, modules: modules} = context) do
     info("Verify #{length(modules)} Knigge facades in '#{app}'.")
 
     context
@@ -107,22 +67,23 @@ defmodule Mix.Tasks.Knigge.Verify do
 
   defp merge_with_context(%{missing: _} = result, context) do
     context
-    |> Map.put(:error, :missing_module)
+    |> Map.put(:error, :missing_modules)
     |> Map.merge(result)
   end
 
   defp merge_with_context(result, context), do: Map.merge(context, result)
 
-  defp finish(context) do
-    print_result(context)
-    completed_in(context)
-
-    maybe_error(context)
+  defp finish_verification(context) do
+    context
+    |> print_result()
+    |> completed_in()
   end
 
   defp print_result(context) do
     print_existing(context)
     print_missing(context)
+
+    context
   end
 
   defp print_existing(%Context{existing: []}), do: :ok
@@ -149,19 +110,40 @@ defmodule Mix.Tasks.Knigge.Verify do
     |> error()
   end
 
-  defp completed_in(%Context{began_at: began_at}) do
-    duration = Float.round((current_millis() - began_at) / 1_000, 3)
+  defp completed_in(context) do
+    context = Context.finished(context)
+
+    duration =
+      context
+      |> Context.duration()
+      |> Kernel./(1_000)
+      |> Float.round(3)
 
     info("\nCompleted in #{duration} seconds.\n")
+
+    context
   end
 
-  defp maybe_error(%Context{error: nil}), do: :ok
-  defp maybe_error(%Context{error: reason}), do: {:error, reason}
+  defp exit_with(%Context{error: :missing_modules} = context) do
+    error(
+      :stderr,
+      "Validation failed for #{length(context.missing)}/#{length(context.modules)} facades."
+    )
 
+    exit_with({:error, :missing_modules})
+  end
+
+  defp exit_with(%Context{} = context) when Context.is_error(context) do
+    exit_with({:error, context.error})
+  end
+
+  @exit_codes %{unknown_app: 1, missing_modules: 2}
+  @exit_reasons Map.keys(@exit_codes)
   defp exit_with({:error, reason}) when reason in @exit_reasons do
     exit({:shutdown, @exit_codes[reason]})
   end
 
+  @unknown_error_code 64
   defp exit_with({:error, unknown_reason}) do
     error("An unknown error occurred: #{inspect(unknown_reason)}")
 
