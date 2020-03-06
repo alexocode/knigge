@@ -3,7 +3,7 @@
 Before version 1.2.0 `Knigge` used to try to verify at compile time whether the implementation module of a facade exists.
 If `Knigge` found the implementation missing it would raise an error.
 
-The idea being that this would catch spelling mistakes and the like **before** the application.
+The idea being that this would catch spelling mistakes and the like **before** releasing the application.
 Having a spelling error in delegating to the implementation is **no bueno**: it will crash and burn in a horrible disaster at runtime.
 
 At the time the idea seemed great - and to be honest I still think it does - but reality turned out to be more complicated.
