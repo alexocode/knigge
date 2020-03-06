@@ -141,6 +141,16 @@ defmodule Knigge do
 
   For further information about options check the `Knigge.Options` module.
 
+  ## Verifying your Implementations - `mix knigge.verify`
+
+  Before version 1.2.0 `Knigge` tried to check at compile time if the implementation of your facade existed.
+  Due to the way the Elixir compiler goes about compiling your modules this didn't work as expected - [checkout this page if you're interested in the details](https://hexdocs.pm/knigge/the-existence-check.html).
+
+  As an alternative `Knigge` now offers the `mix knigge.verify` task which verifies that the implementation modules of your facades actually exist.
+  The task returns with an error code when an implementation is missing, which allows you to plug it into your CI pipeline - for example as `MIX_ENV=prod mix knigge.verify`.
+
+  For details check the documentation of `mix knigge.verify` by running `mix help knigge.verify`.
+
   ## Knigge and the `:test` environment
 
   To give the maximum amount of flexibility `Knigge` delegates at runtime in your
