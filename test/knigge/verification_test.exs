@@ -1,8 +1,8 @@
-defmodule Knigge.VerifyTest do
+defmodule Knigge.VerificationTest do
   use ExUnit.Case, async: true
 
   defmodule FacadeWithImpl do
-    use Knigge, implementation: Knigge.VerifyTest.FacadeImpl
+    use Knigge, implementation: Knigge.VerificationTest.FacadeImpl
 
     @callback some_function() :: :ok
   end
@@ -17,18 +17,18 @@ defmodule Knigge.VerifyTest do
   end
 
   defmodule FacadeImpl do
-    @behaviour Knigge.VerifyTest.FacadeWithImpl
+    @behaviour Knigge.VerificationTest.FacadeWithImpl
 
     def some_function, do: :ok
   end
 
-  describe ".implementation/1" do
+  describe ".check_implementation/1" do
     test "returns :ok if the implementation exists" do
-      assert Knigge.Verify.implementation(FacadeWithImpl) == {:ok, FacadeImpl}
+      assert Knigge.Verification.check_implementation(FacadeWithImpl) == {:ok, FacadeImpl}
     end
 
     test "returns an error if the implementation is missing" do
-      assert Knigge.Verify.implementation(FacadeWithoutImpl) ==
+      assert Knigge.Verification.check_implementation(FacadeWithoutImpl) ==
                {:error, {:missing, Does.Not.Exist}}
     end
   end
