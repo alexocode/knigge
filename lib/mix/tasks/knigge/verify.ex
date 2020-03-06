@@ -3,6 +3,7 @@ defmodule Mix.Tasks.Knigge.Verify do
 
   import Knigge.CLI.Output
 
+  alias Knigge.Verification
   alias Knigge.Verification.Context
 
   require Context
@@ -11,22 +12,20 @@ defmodule Mix.Tasks.Knigge.Verify do
 
   @impl Mix.Task
   def run(_args) do
+    Mix.Task.run("compile")
+
     calling_app()
     |> run_for()
     |> exit_with()
   end
 
-  defp calling_app do
-    Mix.Task.run("compile")
-
-    Mix.Project.get().project()[:app]
-  end
+  defp calling_app, do: Mix.Project.get().project()[:app]
 
   defp run_for(app) do
     with {:ok, context} <- Context.for_app(app) do
       context
       |> begin_verification()
-      |> verify_implementations()
+      |> Verification.run()
       |> finish_verification()
     else
       {:error, {:unknown_app, app}} ->
@@ -39,39 +38,17 @@ defmodule Mix.Tasks.Knigge.Verify do
     end
   end
 
+  defp begin_verification(%Context{modules: []} = context) do
+    warn("No modules in `#{app}` found which `use Knigge`.")
+
+    context
+  end
+
   defp begin_verification(%Context{app: app, modules: modules} = context) do
     info("Verify #{length(modules)} Knigge facades in '#{app}'.")
 
     context
   end
-
-  defp verify_implementations(%Context{app: app, modules: []} = context) do
-    warn("\nNo modules in `#{app}` found which `use Knigge`.")
-
-    context
-  end
-
-  defp verify_implementations(context) do
-    context.modules
-    |> Enum.map(&verify_implementation/1)
-    |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
-    |> merge_with_context(context)
-  end
-
-  defp verify_implementation(module) do
-    case Knigge.Verify.implementation(module) do
-      {:ok, implementation} -> {:existing, {module, implementation}}
-      {:error, {:missing, implementation}} -> {:missing, {module, implementation}}
-    end
-  end
-
-  defp merge_with_context(%{missing: _} = result, context) do
-    context
-    |> Map.put(:error, :missing_modules)
-    |> Map.merge(result)
-  end
-
-  defp merge_with_context(result, context), do: Map.merge(context, result)
 
   defp finish_verification(context) do
     context
