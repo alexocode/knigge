@@ -143,8 +143,18 @@ defmodule Mix.Tasks.Knigge.Verify do
     exit_with({:error, :missing_modules})
   end
 
-  defp exit_with(%Context{} = context) when Context.is_error(context) do
-    exit_with({:error, context.error})
+  if Knigge.OTP.release() >= 21 do
+    defp exit_with(%Context{} = context) when Context.is_error(context) do
+      exit_with({:error, context.error})
+    end
+  else
+    defp exit_with(%Context{} = context) do
+      if Context.error?(context) do
+        exit_with({:error, context.error})
+      else
+        :ok
+      end
+    end
   end
 
   @exit_codes %{unknown_app: 1, missing_modules: 2}
