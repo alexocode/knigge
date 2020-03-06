@@ -21,7 +21,7 @@ defmodule Knigge.Verification do
   end
 
   defp verify_implementation(module) do
-    case Verification.implementation(module) do
+    case check_implementation(module) do
       {:ok, implementation} -> {:existing, {module, implementation}}
       {:error, {:missing, implementation}} -> {:missing, {module, implementation}}
     end
@@ -38,10 +38,10 @@ defmodule Knigge.Verification do
   @doc """
   Checks if the given `Knigge` module's implementation exists. Returns an error if not.
   """
-  @spec implementation(module :: module()) ::
+  @spec check_implementation(module :: module()) ::
           {:ok, implementation :: module()}
           | {:error, {:missing, implementation :: module()}}
-  def implementation(module) do
+  def check_implementation(module) do
     implementation = module.__knigge__(:implementation)
 
     if Knigge.Module.exists?(implementation) do
