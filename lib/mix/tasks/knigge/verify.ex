@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Knigge.Verify do
     end
   end
 
-  defp begin_verification(%Context{modules: []} = context) do
+  defp begin_verification(%Context{app: app, modules: []} = context) do
     warn("No modules in `#{app}` found which `use Knigge`.")
 
     context
