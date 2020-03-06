@@ -26,6 +26,7 @@ defmodule Knigge.MixProject do
 
       # Hex
       description: description(),
+      docs: docs(),
       package: package(),
       version: @version
     ]
@@ -66,6 +67,30 @@ defmodule Knigge.MixProject do
 
   def description do
     "An opinionated way of dealing with behaviours."
+  end
+
+  @extras Path.wildcard("pages/**/*.md")
+  def docs do
+    [
+      main: "Knigge",
+      source_ref: "v#{@version}",
+      source_url: "https://github.com/sascha-wolf/knigge",
+      extras: @extras,
+      groups_for_modules: [
+        "Overview & Configuration": [
+          Knigge,
+          Knigge.Options
+        ],
+        "Code Generation": [
+          Knigge.Behaviour,
+          Knigge.Code,
+          Knigge.Implementation
+        ],
+        Verification: [
+          Knigge.Verification
+        ]
+      ]
+    ]
   end
 
   def package do
