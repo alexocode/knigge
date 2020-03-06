@@ -1,8 +1,6 @@
 defmodule Knigge.Module do
   @moduledoc false
 
-  alias Knigge.Options
-
   module = inspect(__MODULE__)
 
   def ensure_exists!(module, env) do
