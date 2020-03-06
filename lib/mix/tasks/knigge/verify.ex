@@ -8,7 +8,40 @@ defmodule Mix.Tasks.Knigge.Verify do
 
   require Context
 
-  @recursive true
+  @shortdoc "Verify the validity of your facades and their implementations."
+  @moduledoc """
+  #{@shortdoc}
+
+  At the moment `knigge.verify` "only" ensures that the implementation modules
+  of your facades exist. Running the task on a code base with two facades might
+  look like this:
+
+      $ mix knigge.verify
+      Verify 2 Knigge facades in 'my_app'.
+
+      1/2 Facades passed:
+      MyApp.MyGreatFacade -> MyApp.MyGreatImpl
+
+      1/2 Facades failed:
+      MyApp.AnotherFacade -> MyApp.AnothrImpl (implementation does not exist)
+
+      Completed in 0.009 seconds.
+
+      Validation failed for 1/2 facades.
+
+  The attentive reader might have noticed that `MyApp.AnothrImpl` contains a
+  spelling error: `Anothr` instead of `Another`.
+
+  Catching errors like this is the main responsibility of `knigge.verify`. When
+  an issue is detected the task will exit with an error code, which allows you
+  to use it in your CI pipeline - for example before you build your production
+  release.
+
+  ## Options
+
+  At the moment `knigge.verify` offers no options. If you think this should be
+  different please open an issue.
+  """
 
   @impl Mix.Task
   def run(_args) do
