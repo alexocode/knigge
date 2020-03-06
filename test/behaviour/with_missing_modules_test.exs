@@ -14,52 +14,30 @@ defmodule Behaviour.WithMissingModulesTest do
     def some_function, do: nil
   end
 
-  test "raises a CompileError when the Implementation does not exist" do
-    assert_raise CompileError,
-                 ~r"the given module could not be found: DoesNotExist",
-                 fn ->
-                   define_facade(
-                     behaviour: Behaviour,
-                     implementation: DoesNotExist,
-                     check_if_exists?: :test
-                   )
-                 end
-  end
-
   test "raises a CompileError when the Behaviour does not exist" do
     assert_raise CompileError,
                  ~r"the given module could not be found: MissingBehaviour",
                  fn ->
                    define_facade(
                      behaviour: MissingBehaviour,
-                     implementation: Implementation,
-                     check_if_exists?: [except: :dev]
+                     implementation: Implementation
                    )
                  end
   end
 
-  test "raises a CompileError when both don't exist and `only: [:test, :dev]` is passed for existence check" do
+  test "raises a CompileError when both don't exist" do
     assert_raise CompileError,
-                 ~r"the given module could not be found: DoesNotExist",
+                 ~r"the given module could not be found: MissingBehaviour",
                  fn ->
                    define_facade(
-                     behaviour: Behaviour,
-                     implementation: DoesNotExist,
-                     check_if_exists?: [only: [:test, :dev]]
+                     behaviour: MissingBehaviour,
+                     implementation: DoesNotExist
                    )
                  end
   end
 
   test "does not raise any error when both the Behaviour and the Implementation exist" do
     define_facade(behaviour: Behaviour, implementation: Implementation)
-  end
-
-  test "does not raise any error when the implementation is missing but check_if_exists is set to false" do
-    define_facade(
-      behaviour: Behaviour,
-      implementation: MissingImplementation,
-      check_if_exists?: false
-    )
   end
 
   defp define_facade(opts) do

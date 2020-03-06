@@ -141,6 +141,16 @@ defmodule Knigge do
 
   For further information about options check the `Knigge.Options` module.
 
+  ## Verifying your Implementations - `mix knigge.verify`
+
+  Before version 1.2.0 `Knigge` tried to check at compile time if the implementation of your facade existed.
+  Due to the way the Elixir compiler goes about compiling your modules this didn't work as expected - [checkout this page if you're interested in the details](https://hexdocs.pm/knigge/the-existence-check.html).
+
+  As an alternative `Knigge` now offers the `mix knigge.verify` task which verifies that the implementation modules of your facades actually exist.
+  The task returns with an error code when an implementation is missing, which allows you to plug it into your CI pipeline - for example as `MIX_ENV=prod mix knigge.verify`.
+
+  For details check the documentation of `mix knigge.verify` by running `mix help knigge.verify`.
+
   ## Knigge and the `:test` environment
 
   To give the maximum amount of flexibility `Knigge` delegates at runtime in your
@@ -198,9 +208,13 @@ defmodule Knigge do
       behaviour =
         options
         |> Knigge.Behaviour.fetch!()
-        |> Knigge.Module.ensure_exists!(options, __ENV__)
+        |> Knigge.Module.ensure_exists!(__ENV__)
 
       @__knigge__ {:options, options}
+
+      @doc "Acts as a \"flag\" to mark this module as a Knigge module."
+      @spec __knigge__() :: :ok
+      def __knigge__, do: :ok
 
       @doc "Access Knigge internal values, such as the implementation being delegated to etc."
       @spec __knigge__(:behaviour) :: module()
@@ -215,10 +229,7 @@ defmodule Knigge do
           Knigge.Implementation.fetch!(__knigge__(:options))
         end
       else
-        implementation =
-          options
-          |> Knigge.Implementation.fetch!()
-          |> Knigge.Module.ensure_exists!(options, __ENV__)
+        implementation = Knigge.Implementation.fetch!(options)
 
         def __knigge__(:implementation) do
           unquote(implementation)

@@ -26,6 +26,7 @@ defmodule Knigge.MixProject do
 
       # Hex
       description: description(),
+      docs: docs(),
       package: package(),
       version: @version
     ]
@@ -44,8 +45,10 @@ defmodule Knigge.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:bunt, "~> 0.2"},
+
       # No Runtime
-      {:credo, "~> 1.0.0", only: [:dev, :test], runtime: false},
+      {:credo, ">= 1.0.0", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
 
@@ -64,6 +67,30 @@ defmodule Knigge.MixProject do
 
   def description do
     "An opinionated way of dealing with behaviours."
+  end
+
+  @extras Path.wildcard("pages/**/*.md")
+  def docs do
+    [
+      main: "Knigge",
+      source_ref: "v#{@version}",
+      source_url: "https://github.com/sascha-wolf/knigge",
+      extras: @extras,
+      groups_for_modules: [
+        "Overview & Configuration": [
+          Knigge,
+          Knigge.Options
+        ],
+        "Code Generation": [
+          Knigge.Behaviour,
+          Knigge.Code,
+          Knigge.Implementation
+        ],
+        Verification: [
+          Knigge.Verification
+        ]
+      ]
+    ]
   end
 
   def package do

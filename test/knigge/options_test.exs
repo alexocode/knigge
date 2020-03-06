@@ -11,7 +11,18 @@ defmodule Knigge.OptionsTest do
     warnings = capture_io(:stderr, fn -> valid_opts(check_if_exists: true) end)
 
     assert warnings =~
-             "Knigge encountered the deprecated option `check_if_exists`, please use `check_if_exists?`."
+             "Knigge encountered the deprecated option `check_if_exists`, " <>
+               "this option is no longer supported; " <>
+               "please use the mix task `mix knigge.verify`."
+  end
+
+  test "using `check_if_exists?` prints a deprecation warning" do
+    warnings = capture_io(:stderr, fn -> valid_opts(check_if_exists?: true) end)
+
+    assert warnings =~
+             "Knigge encountered the deprecated option `check_if_exists?`, " <>
+               "this option is no longer supported; " <>
+               "please use the mix task `mix knigge.verify`."
   end
 
   test "using `delegate_at` prints a deprecation warning" do

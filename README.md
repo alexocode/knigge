@@ -2,7 +2,9 @@
 [![Build Status](https://travis-ci.org/sascha-wolf/knigge.svg?branch=master)](https://travis-ci.org/sascha-wolf/knigge)
 [![Coverage Status](https://coveralls.io/repos/github/sascha-wolf/knigge/badge.svg?branch=master)](https://coveralls.io/github/sascha-wolf/knigge?branch=master)
 [![Inline docs](https://inch-ci.org/github/sascha-wolf/knigge.svg?branch=master)](https://inch-ci.org/github/sascha-wolf/knigge)
+[![Hexdocs.pm](https://img.shields.io/badge/hexdocs-online-blue)](https://hexdocs.pm/knigge/)
 [![Hex.pm](https://img.shields.io/hexpm/v/knigge.svg)](https://hex.pm/packages/knigge)
+[![Hex.pm Downloads](https://img.shields.io/hexpm/dt/knigge)](https://hex.pm/packages/knigge)
 [![Featured - ElixirRadar](https://img.shields.io/badge/featured-ElixirRadar-543A56)](https://app.rdstation.com.br/mail/0ddee1c8-2ce9-405b-b95f-09c883099090?utm_campaign=elixir_radar_202&utm_medium=email&utm_source=RD+Station)
 [![Featured - ElixirWeekly](https://img.shields.io/badge/featured-ElixirWeekly-875DB0)](https://elixirweekly.net/issues/161)
 
@@ -22,11 +24,16 @@ passing the behaviour which should be "facaded" as an option.
 
 ## Overview
 
-- [Installation](#installation)
-- [Motivation](#motivation)
-- [Examples](#examples)
-- [Options](#options)
-- [Knigge and the `:test` environment](#knigge-and-the-test-environment)
+- [Knigge](#knigge)
+  - [Overview](#overview)
+  - [Installation](#installation)
+  - [Motivation](#motivation)
+  - [Examples](#examples)
+    - [`defdefault` - Fallback implementations for optional callbacks](#defdefault---fallback-implementations-for-optional-callbacks)
+  - [Options](#options)
+  - [Verifying your Implementations - `mix knigge.verify`](#verifying-your-implementations---mix-kniggeverify)
+  - [Knigge and the `:test` environment](#knigge-and-the-test-environment)
+    - [Compiler Warnings](#compiler-warnings)
 
 ## Installation
 
@@ -195,6 +202,16 @@ as option - by default `Knigge` delegates at runtime in your `:test`s.
 
 For further information about options check the [`Knigge.Options` module](https://hexdocs.pm/knigge/Knigge.Options.html).
 
+## Verifying your Implementations - `mix knigge.verify`
+
+Before version 1.2.0 `Knigge` tried to check at compile time if the implementation of your facade existed.
+Due to the way the Elixir compiler goes about compiling your modules this didn't work as expected - [checkout this page if you're interested in the details](https://hexdocs.pm/knigge/the-existence-check.html).
+
+As an alternative `Knigge` now offers the `mix knigge.verify` task which verifies that the implementation modules of your facades actually exist.
+The task returns with an error code when an implementation is missing, which allows you to plug it into your CI pipeline - for example as `MIX_ENV=prod mix knigge.verify`.
+
+For details check the documentation of `mix knigge.verify` by running `mix help knigge.verify`.
+
 ## Knigge and the `:test` environment
 
 To give the maximum amount of flexibility `Knigge` delegates at runtime in your
@@ -211,7 +228,7 @@ In case you change the `delegate_at_runtime?` configuration to anything which
 excludes the `:test` environment you will - most likely - encounter compiler
 warnings like this:
 
-```
+```text
 warning: function MyMock.my_great_callback/1 is undefined (module MyMock is not available)
   lib/my_facade.ex:1
 

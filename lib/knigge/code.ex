@@ -63,27 +63,24 @@ defmodule Knigge.Code do
             Default.callback_to_defdefault(callback,
               from: module,
               default: default,
-              delegate_at_runtime?: delegate_at_runtime?,
-              env: env
+              delegate_at_runtime?: delegate_at_runtime?
             )
           end
 
         true ->
           Delegate.callback_to_defdelegate(callback,
             from: module,
-            delegate_at_runtime?: delegate_at_runtime?,
-            env: env
+            delegate_at_runtime?: delegate_at_runtime?
           )
       end
     end
   end
 
   defp get_behaviour(module, env) do
-    opts = Knigge.options!(module)
-
-    opts
+    module
+    |> Knigge.options!()
     |> Knigge.Behaviour.fetch!()
-    |> Knigge.Module.ensure_exists!(opts, env)
+    |> Knigge.Module.ensure_exists!(env)
   end
 
   defp get_callbacks(module) do
