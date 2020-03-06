@@ -140,16 +140,32 @@ defmodule Knigge.Verification.Context do
   @doc """
   Returns whether or not this context is considered an error.
 
+  Can be used in guards.
+
   ## Examples
 
+      iex> require #{module}
       iex> context = %#{module}{error: nil}
-      iex> #{module}.error?(context)
+      iex> #{module}.is_error(context)
       false
 
+      iex> require #{module}
       iex> context = %#{module}{error: :some_error}
-      iex> #{module}.error?(context)
+      iex> #{module}.is_error(context)
       true
   """
+  @spec is_error(t()) :: boolean()
+  defguard is_error(context)
+           when :erlang.is_map_key(:__struct__, context) and
+                  :erlang.map_get(:__struct__, context) == __MODULE__ and
+                  :erlang.is_map_key(:error, context) and
+                  :erlang.map_get(:error, context) != nil
+
+  @doc """
+  Returns whether or not this context is considered an error.
+
+  Uses `is_error/1`.
+  """
   @spec error?(t()) :: boolean()
-  def error?(%__MODULE__{error: error}), do: not is_nil(error)
+  def error?(context), do: is_error(context)
 end
