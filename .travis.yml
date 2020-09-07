@@ -22,6 +22,7 @@ stages:
   - name: test
     if: NOT branch =~ ^wip/
   - name: coverage
+    if: NOT branch =~ ^wip/
   - name: docs
     if: branch = master AND type = push AND fork = false
   - name: publish
@@ -30,7 +31,7 @@ stages:
 jobs:
   include:
     - stage: test
-      scripe: mix test
+      script: mix test
     - stage: coverage
       script: mix coveralls.travis
       elixir: 1.9.0
