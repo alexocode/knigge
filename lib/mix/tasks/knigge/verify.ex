@@ -39,20 +39,51 @@ defmodule Mix.Tasks.Knigge.Verify do
 
   ## Options
 
-  At the moment `knigge.verify` offers no options. If you think this should be
-  different please open an issue.
+  --app (optional):
+    Name of the app for which the facades need to be verified.
+    Defaults to the current working environment app.
   """
 
+  @exit_codes %{unknown_app: 1, missing_modules: 2, unknown_options: 3}
+  @exit_reasons Map.keys(@exit_codes)
+
+  @unknown_error_code 64
+
   @impl Mix.Task
-  def run(_args) do
+  def run(raw_args) do
     Mix.Task.run("compile")
 
-    calling_app()
-    |> run_for()
-    |> exit_with()
+    {args, _argv, _errors} =
+
+    case OptionParser.parse(raw_args, strict: [app: :string]) do
+      {args, _argv, []} ->
+        app = case args[:app] do
+          nil -> calling_app()
+          app_string -> String.to_atom(app_string)
+        end
+
+        app
+        |> run_for()
+        |> exit_with()
+
+      {_parsed, _argv, errors} ->
+        unknown_switches(errors)
+    end
   end
 
   defp calling_app, do: Mix.Project.get().project()[:app]
+
+  defp unknown_switches(errors) do
+    prefix = "Unknown switch(es) received: "
+
+    options =
+      errors
+      |> Keyword.keys()
+      |> Enum.join(", ")
+
+    error(prefix <> options)
+    exit_with({:error, :unknown_switches})
+  end
 
   defp run_for(app) do
     with {:ok, context} <- Context.for_app(app) do
@@ -157,13 +188,10 @@ defmodule Mix.Tasks.Knigge.Verify do
     end
   end
 
-  @exit_codes %{unknown_app: 1, missing_modules: 2}
-  @exit_reasons Map.keys(@exit_codes)
   defp exit_with({:error, reason}) when reason in @exit_reasons do
     exit({:shutdown, @exit_codes[reason]})
   end
 
-  @unknown_error_code 64
   defp exit_with({:error, unknown_reason}) do
     error("An unknown error occurred: #{inspect(unknown_reason)}")
 
