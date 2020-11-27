@@ -24,16 +24,15 @@ passing the behaviour which should be "facaded" as an option.
 
 ## Overview
 
-- [Knigge](#knigge)
-  - [Overview](#overview)
-  - [Installation](#installation)
-  - [Motivation](#motivation)
-  - [Examples](#examples)
-    - [`defdefault` - Fallback implementations for optional callbacks](#defdefault---fallback-implementations-for-optional-callbacks)
-  - [Options](#options)
-  - [Verifying your Implementations - `mix knigge.verify`](#verifying-your-implementations---mix-kniggeverify)
-  - [Knigge and the `:test` environment](#knigge-and-the-test-environment)
-    - [Compiler Warnings](#compiler-warnings)
+- [Overview](#overview)
+- [Installation](#installation)
+- [Motivation](#motivation)
+- [Examples](#examples)
+  - [`defdefault` - Fallback implementations for optional callbacks](#defdefault---fallback-implementations-for-optional-callbacks)
+- [Options](#options)
+- [Verifying your Implementations - `mix knigge.verify`](#verifying-your-implementations---mix-kniggeverify)
+- [Knigge and the `:test` environment](#knigge-and-the-test-environment)
+  - [Compiler Warnings](#compiler-warnings)
 
 ## Installation
 
