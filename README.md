@@ -1,7 +1,6 @@
 # Knigge
 [![CI](https://github.com/sascha-wolf/knigge/workflows/CI/badge.svg)](https://github.com/sascha-wolf/knigge/actions?query=branch%3Amain+workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/sascha-wolf/knigge/badge.svg?branch=main)](https://coveralls.io/github/sascha-wolf/knigge?branch=main)
-[![Inline docs](https://inch-ci.org/github/sascha-wolf/knigge.svg?branch=main)](https://inch-ci.org/github/sascha-wolf/knigge)
 [![Hexdocs.pm](https://img.shields.io/badge/hexdocs-online-blue)](https://hexdocs.pm/knigge/)
 [![Hex.pm](https://img.shields.io/hexpm/v/knigge.svg)](https://hex.pm/packages/knigge)
 [![Hex.pm Downloads](https://img.shields.io/hexpm/dt/knigge)](https://hex.pm/packages/knigge)
