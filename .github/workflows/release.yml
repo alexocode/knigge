@@ -42,7 +42,7 @@ jobs:
             _build/
             deps/
           key: alpine-elixir-1.11.2-otp-22.3.4.3-build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: alpine-elixir-1.11.2-otp-22.3.4.3-deps-
+          restore-keys: alpine-elixir-1.11.2-otp-22.3.4.3-build-
 
       - run: mix compile --warnings-as-errors
 
