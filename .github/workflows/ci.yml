@@ -33,6 +33,9 @@ jobs:
           - elixir: 1.11.2
             otp: 23.0.2
     steps:
+      - name: Install GNU tar (required for actions/cache@v2)
+        run: apk add --no-cache tar
+
       - uses: actions/checkout@v2
 
       - name: Cache
@@ -59,8 +62,8 @@ jobs:
     container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
     steps:
       # mix coveralls.github requires git to be available
-      - name: Install git
-        run: apk add --no-cache git
+      - name: Install git (required for mix coveralls.github) and GNU tar (required for actions/cache@v2)
+        run: apk add --no-cache git tar
 
       # mix coveralls.github uses git to fetch the pr head so we ensure the whole history is available
       - uses: actions/checkout@v2
@@ -92,6 +95,9 @@ jobs:
     runs-on: ubuntu-latest
     container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
     steps:
+      - name: Install GNU tar (required for actions/cache@v2)
+        run: apk add --no-cache tar
+
       - uses: actions/checkout@v2
 
       - name: Cache

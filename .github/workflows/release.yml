@@ -14,6 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
     steps:
+      - name: Install GNU tar (required for actions/cache@v2)
+        run: apk add --no-cache tar
+
       - uses: actions/checkout@v2
 
       - name: Write the release version to the version file
