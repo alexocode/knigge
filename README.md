@@ -115,7 +115,7 @@ end
 Under the hood this compiles down to the explicit delegation visible on the top.
 
 In case you don't want to fetch your implementation from the configuration,
-`Knigge` also allows you to explicitely pass the implementation of the
+`Knigge` also allows you to explicitly pass the implementation of the
 behaviour with the aptly named key `implementation`:
 
 ```elixir
