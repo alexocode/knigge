@@ -69,7 +69,10 @@ jobs:
       - name: Install git
         run: apk add --no-cache git
 
+      # mix coveralls.github uses git to fetch the pr head so we ensure the whole history is available
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Cache - deps/
         uses: actions/cache@v1
