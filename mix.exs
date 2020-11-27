@@ -1,8 +1,6 @@
 defmodule Knigge.MixProject do
   use Mix.Project
 
-  @version "version" |> File.read!() |> String.trim()
-
   def project do
     [
       app: :knigge,
@@ -28,7 +26,7 @@ defmodule Knigge.MixProject do
       description: description(),
       docs: docs(),
       package: package(),
-      version: @version
+      version: version()
     ]
   end
 
@@ -53,7 +51,7 @@ defmodule Knigge.MixProject do
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
 
       # Test
-      {:excoveralls, "~> 0.10", only: :test},
+      {:excoveralls, "~> 0.13", only: :test},
       {:mox, "~> 0.5", only: :test},
 
       # Docs
@@ -73,7 +71,7 @@ defmodule Knigge.MixProject do
   def docs do
     [
       main: "Knigge",
-      source_ref: "v#{@version}",
+      source_ref: "v#{version()}",
       source_url: "https://github.com/sascha-wolf/knigge",
       extras: @extras,
       groups_for_modules: [
@@ -102,5 +100,21 @@ defmodule Knigge.MixProject do
       },
       maintainers: ["Sascha Wolf <swolf.dev@gmail.com>"]
     ]
+  end
+
+  @version_file "version"
+  def version do
+    cond do
+      File.exists?(@version_file) ->
+        @version_file
+        |> File.read!()
+        |> String.trim()
+
+      System.get_env("REQUIRE_VERSION_FILE") == "true" ->
+        exit("Version file (`#{@version_file}`) doesn't exist but is required!")
+
+      true ->
+        "0.0.0-dev"
+    end
   end
 end
