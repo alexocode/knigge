@@ -19,7 +19,7 @@ jobs:
       - name: Write the release version to the version file
         run: |
           echo "Create version file for $GITHUB_REF"
-          echo -n "${GITHUB_REF#v}" > version
+          echo -n "${GITHUB_REF#refs/tags/v}" > version
 
       - name: Cache - deps/
         uses: actions/cache@v1
