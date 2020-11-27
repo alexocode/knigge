@@ -21,12 +21,14 @@ jobs:
           echo "Create version file for $GITHUB_REF"
           echo -n "${GITHUB_REF#v}" > version
 
-      - name: Cache - deps/
+      - name: Cache
         uses: actions/cache@v2
         with:
-          path: deps/
-          key: alpine-elixir-1.11.2-otp-22.3.4.3-deps-${{ hashFiles('**/mix.lock') }}
-          restore-keys: alpine-elixir-1.11.2-otp-22.3.4.3-deps-
+          path: |
+            _build/
+            deps/
+          key: v1-publish_to_hex-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-publish_to_hex-mix-
 
       - name: Install dependencies
         run: |
@@ -34,19 +36,9 @@ jobs:
           mix local.hex --force
           mix deps.get
 
-      - name: Cache - _build/
-        uses: actions/cache@v2
-        with:
-          # Some erlang dependencies put build artifacts into `deps/` so we cache that too
-          path: |
-            _build/
-            deps/
-          key: alpine-elixir-1.11.2-otp-22.3.4.3-build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: alpine-elixir-1.11.2-otp-22.3.4.3-build-
-
       - run: mix compile --warnings-as-errors
 
-      - name: Publish
+      - name: Publish to Hex.pm
         run: mix hex.publish --yes
         env:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}

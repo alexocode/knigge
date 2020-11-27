@@ -35,12 +35,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Cache - deps/
+      - name: Cache
         uses: actions/cache@v2
         with:
-          path: deps/
-          key: alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-deps-${{ hashFiles('**/mix.lock') }}
-          restore-keys: alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-deps-
+          path: |
+            _build/
+            deps/
+          key: v1-mix_test-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-mix_test-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-
 
       - name: Install Dependencies
         run: |
@@ -48,20 +50,8 @@ jobs:
           mix local.hex --force
           mix deps.get
 
-      - name: Cache - _build/
-        uses: actions/cache@v2
-        with:
-          # Some erlang dependencies put build artifacts into `deps/` so we cache that too
-          path: |
-            _build/
-            deps/
-          key: alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-build-
-
       - run: mix compile --warnings-as-errors
-
-      - name: Run tests
-        run: mix test
+      - run: mix test
 
   coverage:
     name: Collect Test Coverage
@@ -77,12 +67,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Cache - deps/
+      - name: Cache
         uses: actions/cache@v2
         with:
-          path: deps/
-          key: alpine-elixir-1.11.2-otp-22.3.4.3-deps-${{ hashFiles('**/mix.lock') }}
-          restore-keys: alpine-elixir-1.11.2-otp-22.3.4.3-deps-
+          path: |
+            _build/
+            deps/
+          key: v1-coverage-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-coverage-mix-
 
       - name: Install Dependencies
         run: |
@@ -90,20 +82,8 @@ jobs:
           mix local.hex --force
           mix deps.get
 
-      - name: Cache - _build/
-        uses: actions/cache@v2
-        with:
-          # Some erlang dependencies put build artifacts into `deps/` so we cache that too
-          path: |
-            _build/
-            deps/
-          key: alpine-elixir-1.11.2-otp-22.3.4.3-build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: alpine-elixir-1.11.2-otp-22.3.4.3-build-
-
       - run: mix compile --warnings-as-errors
-
-      - name: Run tests
-        run: mix coveralls.github
+      - run: mix coveralls.github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -114,12 +94,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Cache - deps/
+      - name: Cache
         uses: actions/cache@v2
         with:
-          path: deps/
-          key: alpine-elixir-1.11.2-otp-22.3.4.3-deps-${{ hashFiles('**/mix.lock') }}
-          restore-keys: alpine-elixir-1.11.2-otp-22.3.4.3-deps-
+          path: |
+            _build/
+            deps/
+          key: v1-check_style-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-check_style-mix-
 
       - name: Install Dependencies
         run: |
