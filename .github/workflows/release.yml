@@ -4,13 +4,15 @@ on:
   release:
     types: [published]
 
+env:
+  MIX_ENV: prod
+  REQUIRE_VERSION_FILE: true
+
 jobs:
   publish_to_hex:
     name: Publish to Hex.pm
     runs-on: ubuntu-latest
     container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
-    env:
-      REQUIRE_VERSION_FILE: true
     steps:
       - uses: actions/checkout@v2.3.1
 
@@ -20,7 +22,7 @@ jobs:
           echo -n "${GITHUB_REF#v}" > version
 
       - name: Cache - deps/
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: deps/
           key: alpine-elixir-1.11.2-otp-22.3.4.3-deps-${{ hashFiles('**/mix.lock') }}
@@ -33,11 +35,16 @@ jobs:
           mix deps.get
 
       - name: Cache - _build/
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
-          path: _build/
-          key: alpine-elixir-1.11.2-otp-22.3.4.3-deps-${{ hashFiles('**/mix.lock') }}
+          # Some erlang dependencies put build artifacts into `deps/` so we cache that too
+          path: |
+            _build/
+            deps/
+          key: alpine-elixir-1.11.2-otp-22.3.4.3-build-${{ hashFiles('**/mix.lock') }}
           restore-keys: alpine-elixir-1.11.2-otp-22.3.4.3-deps-
+
+      - run: mix compile --warnings-as-errors
 
       - name: Publish
         run: mix hex.publish --yes
