@@ -56,13 +56,9 @@ defmodule Mix.Tasks.Knigge.Verify do
     {args, _argv, _errors} =
 
     case OptionParser.parse(raw_args, strict: [app: :string]) do
-      {args, _argv, []} ->
-        app = case args[:app] do
-          nil -> calling_app()
-          app_string -> String.to_atom(app_string)
-        end
-
-        app
+      {opts, _argv, []} ->
+        opts
+        |> Keyword.get_lazy(:app, &calling_app/0)
         |> run_for()
         |> exit_with()
 
@@ -74,14 +70,12 @@ defmodule Mix.Tasks.Knigge.Verify do
   defp calling_app, do: Mix.Project.get().project()[:app]
 
   defp unknown_switches(errors) do
-    prefix = "Unknown switch(es) received: "
-
     options =
       errors
       |> Keyword.keys()
       |> Enum.join(", ")
 
-    error(prefix <> options)
+    error("Unknown switch(es) received: " <> options)
     exit_with({:error, :unknown_options})
   end
 
