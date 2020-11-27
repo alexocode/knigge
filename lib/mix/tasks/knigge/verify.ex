@@ -53,17 +53,16 @@ defmodule Mix.Tasks.Knigge.Verify do
   def run(raw_args) do
     Mix.Task.run("compile")
 
-    {args, _argv, _errors} =
-      case OptionParser.parse(raw_args, strict: [app: :string]) do
-        {opts, _argv, []} ->
-          opts
-          |> Keyword.get_lazy(:app, &calling_app/0)
-          |> run_for()
-          |> exit_with()
+    case OptionParser.parse(raw_args, strict: [app: :string]) do
+      {opts, _argv, []} ->
+        opts
+        |> Keyword.get_lazy(:app, &calling_app/0)
+        |> run_for()
+        |> exit_with()
 
-        {_parsed, _argv, errors} ->
-          unknown_switches(errors)
-      end
+      {_parsed, _argv, errors} ->
+        unknown_switches(errors)
+    end
   end
 
   defp calling_app, do: Mix.Project.get().project()[:app]
