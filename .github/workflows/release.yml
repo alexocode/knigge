@@ -14,9 +14,6 @@ jobs:
     runs-on: ubuntu-latest
     container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
     steps:
-      - name: Install GNU tar (required for actions/cache@v2)
-        run: apk add --no-cache tar
-
       - uses: actions/checkout@v2
 
       - name: Write the release version to the version file
@@ -24,20 +21,25 @@ jobs:
           echo "Create version file for $GITHUB_REF"
           echo -n "${GITHUB_REF#v}" > version
 
-      - name: Cache
-        uses: actions/cache@v2
+      - name: Cache - deps/
+        uses: actions/cache@v1
         with:
-          path: |
-            _build/
-            deps/
-          key: v1-publish_to_hex-mix-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-publish_to_hex-mix-
+          path: deps/
+          key: v1-publish_to_hex-deps-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-publish_to_hex-deps-
 
       - name: Install dependencies
         run: |
           mix local.rebar --force
           mix local.hex --force
           mix deps.get
+
+      - name: Cache - _build/
+        uses: actions/cache@v1
+        with:
+          path: _build/
+          key: v1-publish_to_hex-_build-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-publish_to_hex-_build-
 
       - run: mix compile --warnings-as-errors
 

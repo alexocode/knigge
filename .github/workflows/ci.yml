@@ -33,25 +33,27 @@ jobs:
           - elixir: 1.11.2
             otp: 23.0.2
     steps:
-      - name: Install GNU tar (required for actions/cache@v2)
-        run: apk add --no-cache tar
-
       - uses: actions/checkout@v2
 
-      - name: Cache
-        uses: actions/cache@v2
+      - name: Cache - deps/
+        uses: actions/cache@v1
         with:
-          path: |
-            _build/
-            deps/
-          key: v1-mix_test-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-mix_test-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-
+          path: deps/
+          key: v1-mix_test-deps-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-mix_test-deps-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-
 
       - name: Install Dependencies
         run: |
           mix local.rebar --force
           mix local.hex --force
           mix deps.get
+
+      - name: Cache - _build/
+        uses: actions/cache@v1
+        with:
+          path: _build/
+          key: v1-mix_test-_build-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-mix_test-_build-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-
 
       - run: mix compile --warnings-as-errors
       - run: mix test
@@ -61,29 +63,33 @@ jobs:
     runs-on: ubuntu-latest
     container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
     steps:
-      # mix coveralls.github requires git to be available
-      - name: Install git (required for mix coveralls.github) and GNU tar (required for actions/cache@v2)
-        run: apk add --no-cache git tar
+      - name: Install git (required for mix coveralls.github)
+        run: apk add --no-cache git
 
       # mix coveralls.github uses git to fetch the pr head so we ensure the whole history is available
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - name: Cache
-        uses: actions/cache@v2
+      - name: Cache - deps/
+        uses: actions/cache@v1
         with:
-          path: |
-            _build/
-            deps/
-          key: v1-coverage-mix-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-coverage-mix-
+          path: deps/
+          key: v1-coverage-deps-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-coverage-deps-
 
       - name: Install Dependencies
         run: |
           mix local.rebar --force
           mix local.hex --force
           mix deps.get
+
+      - name: Cache - _build/
+        uses: actions/cache@v1
+        with:
+          path: _build/
+          key: v1-coverage-_build-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-coverage-_build-
 
       - run: mix compile --warnings-as-errors
       - run: mix coveralls.github
@@ -95,19 +101,14 @@ jobs:
     runs-on: ubuntu-latest
     container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
     steps:
-      - name: Install GNU tar (required for actions/cache@v2)
-        run: apk add --no-cache tar
-
       - uses: actions/checkout@v2
 
-      - name: Cache
-        uses: actions/cache@v2
+      - name: Cache - deps/
+        uses: actions/cache@v1
         with:
-          path: |
-            _build/
-            deps/
-          key: v1-check_style-mix-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-check_style-mix-
+          path: deps/
+          key: v1-check_style-deps-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-check_style-deps-
 
       - name: Install Dependencies
         run: |
@@ -116,14 +117,11 @@ jobs:
           mix deps.get
 
       - name: Cache - _build/
-        uses: actions/cache@v2
+        uses: actions/cache@v1
         with:
-          # Some erlang dependencies put build artifacts into `deps/` so we cache that too
-          path: |
-            _build/
-            deps/
-          key: alpine-elixir-1.11.2-otp-22.3.4.3-build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: alpine-elixir-1.11.2-otp-22.3.4.3-build-
+          path: _build/
+          key: v1-check_style-_build-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-check_style-_build-
 
       - run: mix compile --warnings-as-errors
       - run: mix format --check-formatted
