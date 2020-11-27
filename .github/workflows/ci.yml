@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+env:
+  MIX_ENV: test
+
 jobs:
   mix_test:
     name: mix test (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}})
@@ -29,8 +32,6 @@ jobs:
             otp: 22.3.4.3
           - elixir: 1.11.2
             otp: 23.0.2
-    env:
-      MIX_ENV: test
     steps:
       - uses: actions/checkout@v2
 
