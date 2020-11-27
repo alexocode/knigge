@@ -57,7 +57,13 @@ jobs:
       - run: mix compile --warnings-as-errors
 
       - name: Run tests
-        run: mix test
+        run: |
+          # coveralls.github requires git to be available
+          apk add --no-cache git > /dev/null
+
+          mix coveralls.github
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   check_style:
     name: Check style
