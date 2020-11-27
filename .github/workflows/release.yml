@@ -5,7 +5,7 @@ on:
     types: [published]
 
 env:
-  MIX_ENV: prod
+  MIX_ENV: dev
   REQUIRE_VERSION_FILE: true
 
 jobs:
