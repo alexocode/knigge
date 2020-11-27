@@ -82,7 +82,7 @@ defmodule Mix.Tasks.Knigge.Verify do
       |> Enum.join(", ")
 
     error(prefix <> options)
-    exit_with({:error, :unknown_switches})
+    exit_with({:error, :unknown_options})
   end
 
   defp run_for(app) do
