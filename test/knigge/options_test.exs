@@ -32,6 +32,15 @@ defmodule Knigge.OptionsTest do
              "Knigge encountered the deprecated option `delegate_at`, please use `delegate_at_runtime?`."
   end
 
+  test "rasies an exception for an invalid `default` value" do
+    message =
+      "Knigge received invalid value for `default`. Expected module but received: \"invalid\""
+
+    assert_raise ArgumentError, message, fn ->
+      valid_opts(default: "invalid")
+    end
+  end
+
   defp valid_opts(opts) do
     [behaviour: SomeModule, implementation: AnotherModule]
     |> Keyword.merge(opts)
