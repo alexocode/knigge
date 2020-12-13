@@ -317,7 +317,7 @@ defmodule Knigge.Options do
     do_not_delegate: :keyword,
     implementation: :module,
     otp_app: :atom,
-    config_key: :atom,
+    config_key: :keys,
     warn: :envs
   ]
 
@@ -335,7 +335,7 @@ defmodule Knigge.Options do
   defp valid_value?(:boolean, value), do: is_boolean(value)
   defp valid_value?(:module, value), do: is_atom(value)
   defp valid_value?(:keyword, value), do: Keyword.keyword?(value)
-
+  defp valid_value?(:keys, value), do: is_atom(value) || is_list(value) && Enum.all?(value, &is_atom/1)
   defp valid_value?(:envs, only: envs), do: valid_envs?(envs)
   defp valid_value?(:envs, except: envs), do: valid_envs?(envs)
   defp valid_value?(:envs, envs), do: valid_envs?(envs)
@@ -351,6 +351,9 @@ defmodule Knigge.Options do
 
       :keyword ->
         "keyword list"
+
+      :keys ->
+        "atom or list of atoms"
 
       other ->
         to_string(other)
