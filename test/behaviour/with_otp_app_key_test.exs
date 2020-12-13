@@ -29,6 +29,20 @@ defmodule Behaviour.WithOtpAppKey do
     assert behaviour.__knigge__(:implementation) == SomeModule
   end
 
+  test "works fine with a default" do
+    # Should not raise
+    behaviour =
+      defmodule_salted WorkingBehaviour do
+        use Knigge,
+          otp_app: :knigge,
+          default: MyApp.SomeModule
+      end
+
+    Application.delete_env(:knigge, :working_behaviour)
+
+    assert behaviour.__knigge__(:implementation) == MyApp.SomeModule
+  end
+
   test "calling my_function/1 delegates the call to the implementation" do
     Application.put_env(:knigge, __MODULE__.AGreatBehaviour, AGreatBehaviourMock)
 
