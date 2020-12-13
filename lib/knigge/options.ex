@@ -335,7 +335,10 @@ defmodule Knigge.Options do
   defp valid_value?(:boolean, value), do: is_boolean(value)
   defp valid_value?(:module, value), do: is_atom(value)
   defp valid_value?(:keyword, value), do: Keyword.keyword?(value)
-  defp valid_value?(:keys, value), do: is_atom(value) || is_list(value) && Enum.all?(value, &is_atom/1)
+
+  defp valid_value?(:keys, value),
+    do: is_atom(value) || (is_list(value) && Enum.all?(value, &is_atom/1))
+
   defp valid_value?(:envs, only: envs), do: valid_envs?(envs)
   defp valid_value?(:envs, except: envs), do: valid_envs?(envs)
   defp valid_value?(:envs, envs), do: valid_envs?(envs)
