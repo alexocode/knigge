@@ -1,7 +1,6 @@
 # Knigge
-[![Build Status](https://travis-ci.org/sascha-wolf/knigge.svg?branch=master)](https://travis-ci.org/sascha-wolf/knigge)
-[![Coverage Status](https://coveralls.io/repos/github/sascha-wolf/knigge/badge.svg?branch=master)](https://coveralls.io/github/sascha-wolf/knigge?branch=master)
-[![Inline docs](https://inch-ci.org/github/sascha-wolf/knigge.svg?branch=master)](https://inch-ci.org/github/sascha-wolf/knigge)
+[![CI](https://github.com/sascha-wolf/knigge/workflows/CI/badge.svg)](https://github.com/sascha-wolf/knigge/actions?query=branch%3Amain+workflow%3ACI)
+[![Coverage Status](https://coveralls.io/repos/github/sascha-wolf/knigge/badge.svg?branch=main)](https://coveralls.io/github/sascha-wolf/knigge?branch=main)
 [![Hexdocs.pm](https://img.shields.io/badge/hexdocs-online-blue)](https://hexdocs.pm/knigge/)
 [![Hex.pm](https://img.shields.io/hexpm/v/knigge.svg)](https://hex.pm/packages/knigge)
 [![Hex.pm Downloads](https://img.shields.io/hexpm/dt/knigge)](https://hex.pm/packages/knigge)
@@ -24,16 +23,15 @@ passing the behaviour which should be "facaded" as an option.
 
 ## Overview
 
-- [Knigge](#knigge)
-  - [Overview](#overview)
-  - [Installation](#installation)
-  - [Motivation](#motivation)
-  - [Examples](#examples)
-    - [`defdefault` - Fallback implementations for optional callbacks](#defdefault---fallback-implementations-for-optional-callbacks)
-  - [Options](#options)
-  - [Verifying your Implementations - `mix knigge.verify`](#verifying-your-implementations---mix-kniggeverify)
-  - [Knigge and the `:test` environment](#knigge-and-the-test-environment)
-    - [Compiler Warnings](#compiler-warnings)
+- [Overview](#overview)
+- [Installation](#installation)
+- [Motivation](#motivation)
+- [Examples](#examples)
+  - [`defdefault` - Fallback implementations for optional callbacks](#defdefault---fallback-implementations-for-optional-callbacks)
+- [Options](#options)
+- [Verifying your Implementations - `mix knigge.verify`](#verifying-your-implementations---mix-kniggeverify)
+- [Knigge and the `:test` environment](#knigge-and-the-test-environment)
+  - [Compiler Warnings](#compiler-warnings)
 
 ## Installation
 
