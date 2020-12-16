@@ -22,9 +22,6 @@ defmodule Behaviour.WithOtpAppKey do
         use Knigge,
           otp_app: :knigge,
           config_key: :working_behaviour
-
-        @callback fun :: boolean
-        @callback melancholy() :: boolean
       end
 
     Application.delete_env(:knigge, :working_behaviour)
