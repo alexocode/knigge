@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+env:
+  MIX_ENV: dev
+  REQUIRE_VERSION_FILE: true
+
+jobs:
+  publish_to_hex:
+    name: Publish to Hex.pm
+    runs-on: ubuntu-latest
+    container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Write the release version to the version file
+        run: |
+          echo "Create version file for $GITHUB_REF"
+          echo -n "${GITHUB_REF#refs/tags/v}" > version
+
+      - name: Cache - deps/
+        uses: actions/cache@v1
+        with:
+          path: deps/
+          key: v1-publish_to_hex-deps-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-publish_to_hex-deps-
+
+      - name: Install dependencies
+        run: |
+          mix local.rebar --force
+          mix local.hex --force
+          mix deps.get
+
+      - name: Cache - _build/
+        uses: actions/cache@v1
+        with:
+          path: _build/
+          key: v1-publish_to_hex-_build-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-publish_to_hex-_build-
+
+      - run: mix compile --warnings-as-errors
+
+      - name: Publish to Hex.pm
+        run: mix hex.publish --yes
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
