@@ -38,6 +38,13 @@ defmodule Knigge.Options do
 
   __Default__: the `use`ing `__MODULE__`
 
+  ### `default`
+  A module which `Knigge` should use when no implementation was configured.
+
+  Is only used when `otp_app` is passed.
+
+  __Default__: `nil`; `Knigge` will raise an error when no implementation is configured.
+
   ### `delegate_at_runtime?`
   A switch to move delegation to runtime, by defauly `Knigge` does as much work as possible at compile time.
   Accepts:
