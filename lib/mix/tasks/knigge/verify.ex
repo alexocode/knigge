@@ -95,13 +95,14 @@ defmodule Mix.Tasks.Knigge.Verify do
   end
 
   defp run_for(app) do
-    with {:ok, context} <- Context.for_app(app) do
-      context
-      |> begin_verification()
-      |> Verification.run()
-      |> finish_verification()
-      |> to_result_tuple()
-    else
+    case Context.for_app(app) do
+      {:ok, context} ->
+        context
+        |> begin_verification()
+        |> Verification.run()
+        |> finish_verification()
+        |> to_result_tuple()
+
       {:error, {:unknown_app, app}} ->
         error("Unable to load modules for #{app || "current app"}, are you sure the app exists?")
 

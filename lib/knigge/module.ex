@@ -46,10 +46,12 @@ defmodule Knigge.Module do
   """
   @spec fetch_for_app(app :: atom()) :: {:ok, list(module())} | {:error, :undefined}
   def fetch_for_app(app) do
-    with {:ok, modules} <- :application.get_key(app, :modules) do
-      {:ok, Enum.filter(modules, &uses_knigge?/1)}
-    else
-      :undefined -> {:error, :undefined}
+    case :application.get_key(app, :modules) do
+      {:ok, modules} ->
+        {:ok, Enum.filter(modules, &uses_knigge?/1)}
+
+      :undefined ->
+        {:error, :undefined}
     end
   end
 

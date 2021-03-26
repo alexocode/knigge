@@ -15,6 +15,7 @@ defmodule Knigge.MixProject do
       ],
       test_coverage: [tool: ExCoveralls],
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       deps: deps(),
 
       # Deps
@@ -40,6 +41,14 @@ defmodule Knigge.MixProject do
   def application do
     [
       extra_applications: [:logger]
+    ]
+  end
+
+  # Aliases are shortcuts or tasks specific to the current project.
+  # See the documentation for `Mix` for more info on aliases.
+  defp aliases do
+    [
+      "check.all": ["format --check-formatted", "credo", "dialyzer"]
     ]
   end
 
