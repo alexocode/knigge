@@ -7,12 +7,21 @@ on:
 env:
   MIX_ENV: dev
   REQUIRE_VERSION_FILE: true
+  CACHE_VERSION_DEPS: v1
+  CACHE_VERSION_BUILD: v1
 
 jobs:
   publish_to_hex:
     name: Publish to Hex.pm
     runs-on: ubuntu-latest
-    container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+    container: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - alpine: 3.11.6
+            elixir: 1.11.2
+            otp: 22.3.4.3
     steps:
       - uses: actions/checkout@v2
 
@@ -25,10 +34,10 @@ jobs:
         uses: actions/cache@v1
         with:
           path: deps/
-          key: v1-publish_to_hex-deps-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-publish_to_hex-deps-
+          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           mix local.rebar --force
           mix local.hex --force
@@ -38,8 +47,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: _build/
-          key: v1-publish_to_hex-_build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-publish_to_hex-_build-
+          key: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
 
       - run: mix compile --warnings-as-errors
 

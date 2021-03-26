@@ -6,31 +6,43 @@ on:
     branches:
       - main
 
+env:
+  CACHE_VERSION_DEPS: v1
+  CACHE_VERSION_BUILD: v1
+  CACHE_VERSION_DIALYZER: v1
+
 jobs:
   mix_test:
     name: mix test (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}})
     runs-on: ubuntu-latest
     container:
-      image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-3.11.6
+      image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
       env:
         MIX_ENV: test
     strategy:
       fail-fast: false
       matrix:
         include:
-          - elixir: 1.7.4
+          - alpine: 3.11.6
+            elixir: 1.7.4
             otp: 20.3.8.19
-          - elixir: 1.8.2
+          - alpine: 3.11.6
+            elixir: 1.8.2
             otp: 20.3.8.19
-          - elixir: 1.9.4
+          - alpine: 3.11.6
+            elixir: 1.9.4
             otp: 20.3.8.19
-          - elixir: 1.9.4
+          - alpine: 3.11.6
+            elixir: 1.9.4
             otp: 21.3.8.16
-          - elixir: 1.10.3
+          - alpine: 3.11.6
+            elixir: 1.10.3
             otp: 21.3.8.16
-          - elixir: 1.11.2
+          - alpine: 3.11.6
+            elixir: 1.11.2
             otp: 22.3.4.3
-          - elixir: 1.11.2
+          - alpine: 3.11.6
+            elixir: 1.11.2
             otp: 23.0.2
     steps:
       - uses: actions/checkout@v2
@@ -39,8 +51,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: deps/
-          key: v1-mix_test-deps-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-mix_test-deps-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-
+          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
 
       - name: Install Dependencies
         run: |
@@ -52,8 +64,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: _build/
-          key: v1-mix_test-_build-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-mix_test-_build-alpine-elixir-${{ matrix.elixir }}-otp-${{ matrix.otp }}-
+          key: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
 
       - run: mix compile --warnings-as-errors
       - run: mix test
@@ -62,9 +74,16 @@ jobs:
     name: Collect Test Coverage
     runs-on: ubuntu-latest
     container:
-      image: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+      image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
       env:
         MIX_ENV: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - alpine: 3.11.6
+            elixir: 1.11.2
+            otp: 22.3.4.3
     steps:
       - name: Install git (required for mix coveralls.github)
         run: apk add --no-cache git
@@ -78,8 +97,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: deps/
-          key: v1-coverage-deps-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-coverage-deps-
+          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV }}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp}}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV }}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp}}-
 
       - name: Install Dependencies
         run: |
@@ -91,8 +110,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: _build/
-          key: v1-coverage-_build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-coverage-_build-
+          key: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
 
       - run: mix compile --warnings-as-errors
       - run: mix coveralls.github
@@ -103,9 +122,16 @@ jobs:
     name: Check Style
     runs-on: ubuntu-latest
     container:
-      image: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+      image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
       env:
         MIX_ENV: dev
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - alpine: 3.11.6
+            elixir: 1.11.2
+            otp: 22.3.4.3
     steps:
       - uses: actions/checkout@v2
 
@@ -113,8 +139,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: deps/
-          key: v1-check_style-deps-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-check_style-deps-
+          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
 
       - name: Install Dependencies
         run: |
@@ -126,8 +152,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: _build/
-          key: v1-check_style-_build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-check_style-_build-
+          key: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
 
       - run: mix compile --warnings-as-errors
       - run: mix format --check-formatted
@@ -137,9 +163,16 @@ jobs:
     name: Check Types
     runs-on: ubuntu-latest
     container:
-      image: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+      image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-
       env:
         MIX_ENV: dev
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - alpine: 3.11.6
+            elixir: 1.11.2
+            otp: 22.3.4.3
     steps:
       - uses: actions/checkout@v2
 
@@ -147,8 +180,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: deps/
-          key: v1-check_style-deps-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-check_style-deps-
+          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
 
       - name: Install Dependencies
         run: |
@@ -160,8 +193,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: _build/
-          key: v1-check_style-_build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: v1-check_style-_build-
+          key: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
 
       - run: mix compile --warnings-as-errors
 
@@ -169,6 +202,6 @@ jobs:
         uses: actions/cache@v1
         with:
           path: .dialyzer/
-          key: v1-check_types-dialyzer-plts
+          key: ${{ env.CACHE_VERSION_DIALYZER }}-dialyzer-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}
 
       - run: mix dialyzer
