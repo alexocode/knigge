@@ -11,20 +11,20 @@ defmodule Knigge do
 
   ## Table of Contents
 
-  - [Table of Contents](#table-of-contents)
-  - [Installation](#installation)
-  - [Motivation](#motivation)
-  - [Examples](#examples)
-    - [Without Knigge](#without-knigge)
-    - [Using Knigge to reduce boilerplate](#using-knigge-to-reduce-boilerplate)
-      - [Specifying a `default` implementation](#specifying-a-default-implementation)
-      - [The `behaviour` key is optional](#the-behaviour-key-is-optional)
-      - [Specifying the `implementation` directly](#specifying-the-implementation-directly)
-    - [`defdefault` - Fallback implementations for optional callbacks](#defdefault---fallback-implementations-for-optional-callbacks)
-  - [Options](#options)
-  - [Verifying your Implementations - `mix knigge.verify`](#verifying-your-implementations---mix-kniggeverify)
-  - [Knigge and the `:test` environment](#knigge-and-the-test-environment)
-    - [Compiler Warnings](#compiler-warnings)
+  - [Table of Contents](#module-table-of-contents)
+  - [Installation](#module-installation)
+  - [Motivation](#module-motivation)
+  - [Examples](#module-examples)
+    - [Without Knigge](#module-without-knigge)
+    - [Using Knigge to reduce boilerplate](#module-using-knigge-to-reduce-boilerplate)
+      - [Specifying a `default` implementation](#module-specifying-a-default-implementation)
+      - [The `behaviour` key is optional](#module-the-behaviour-key-is-optional)
+      - [Specifying the `implementation` directly](#module-specifying-the-implementation-directly)
+    - [`defdefault` - Fallback implementations for optional callbacks](#module-defdefault-fallback-implementations-for-optional-callbacks)
+  - [Options](#module-options)
+  - [Verifying your implementations - `mix knigge.verify`](#module-verifying-your-implementations-mix-knigge-verify)
+  - [Knigge and the `:test` environment](#module-knigge-and-the-test-environment)
+    - [Compiler Warnings](#module-compiler-warnings)
 
   ## Installation
 
@@ -199,7 +199,7 @@ defmodule Knigge do
 
   For further information about options check the `Knigge.Options` module.
 
-  ## Verifying your Implementations - `mix knigge.verify`
+  ## Verifying your implementations - `mix knigge.verify`
 
   Before version 1.2.0 `Knigge` tried to check at compile time if the implementation of your facade existed.
   Due to the way the Elixir compiler goes about compiling your modules this didn't work as expected - [checkout this page if you're interested in the details](https://hexdocs.pm/knigge/the-existence-check.html).
