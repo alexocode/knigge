@@ -7,9 +7,9 @@ on:
       - main
 
 env:
-  CACHE_VERSION_DEPS: v1
-  CACHE_VERSION_BUILD: v1
-  CACHE_VERSION_DIALYZER: v1
+  CACHE_PREFIX_DEPS: v1-deps
+  CACHE_PREFIX_BUILD: v1-_build
+  CACHE_PREFIX_DIALYZER: v1-dialyzer
 
 jobs:
   mix_test:
@@ -53,8 +53,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: deps/
-          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
+          key: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
 
       - name: Install Dependencies
         run: |
@@ -66,8 +66,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: _build/
-          key: ${{ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
+          key: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
 
       - run: mix compile --warnings-as-errors
       - run: mix test
@@ -94,8 +94,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: deps/
-          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP}}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP}}-
+          key: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP}}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP}}-
 
       - name: Install Dependencies
         run: |
@@ -107,8 +107,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: _build/
-          key: ${{ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
+          key: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
 
       - run: mix compile --warnings-as-errors
       - run: mix coveralls.github
@@ -131,8 +131,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: deps/
-          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
+          key: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
 
       - name: Install Dependencies
         run: |
@@ -144,8 +144,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: _build/
-          key: ${{ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
+          key: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
 
       - run: mix compile --warnings-as-errors
       - run: mix format --check-formatted
@@ -167,8 +167,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: deps/
-          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
+          key: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
 
       - name: Install Dependencies
         run: |
@@ -181,8 +181,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: _build/
-          key: ${{ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
+          key: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
 
       - run: mix compile --warnings-as-errors
 
@@ -190,6 +190,6 @@ jobs:
         uses: actions/cache@v1
         with:
           path: .dialyzer/
-          key: ${{ env.CACHE_VERSION_DIALYZER }}-dialyzer-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}
+          key: ${{ env.CACHE_PREFIX_DIALYZER }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}
 
       - run: mix dialyzer
