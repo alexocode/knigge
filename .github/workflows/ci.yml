@@ -73,6 +73,7 @@ jobs:
       - run: mix test
 
   coverage:
+    name: Collect Test Coverage
     runs-on: ubuntu-latest
     container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
     env:
