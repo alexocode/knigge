@@ -18,7 +18,7 @@ defmodule Knigge.MixProject do
       deps: deps(),
 
       # Deps
-      dialyzer: [ignore_warnings: ".dialyzer_ignore.exs"],
+      dialyzer: dialyzer(),
 
       # Docs
       name: "Knigge",
@@ -59,6 +59,13 @@ defmodule Knigge.MixProject do
 
       # Docs
       {:inch_ex, ">= 0.0.0", only: :docs}
+    ]
+  end
+
+  defp dialyzer do
+    [
+      ignore_warnings: ".dialyzer_ignore.exs",
+      plt_file: {:no_warn, ".dialyzer/dialyzer.plt"}
     ]
   end
 
