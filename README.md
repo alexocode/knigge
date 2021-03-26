@@ -25,6 +25,7 @@ passing the behaviour which should be "facaded" as an option.
 
 - [Overview](#overview)
 - [Installation](#installation)
+- [Contributing](#contributing)
 - [Motivation](#motivation)
 - [Examples](#examples)
   - [`defdefault` - Fallback implementations for optional callbacks](#defdefault---fallback-implementations-for-optional-callbacks)
@@ -40,10 +41,16 @@ Simply add `knigge` to your list of dependencies in your `mix.exs`:
 ```elixir
 def deps do
   [
-    {:knigge, "~> 1.1"}
+    {:knigge, "~> 1.3"}
   ]
 end
 ```
+
+Differences between the versions are explained in [the Changelog](./CHANGELOG.md).
+
+## Contributing
+
+Contributions are always welcome but please read [our contribution guidelines](./CONTRIBUTING.md) before doing so.
 
 ## Motivation
 
