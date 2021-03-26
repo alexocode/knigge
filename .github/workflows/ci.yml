@@ -13,7 +13,7 @@ env:
 
 jobs:
   mix_test:
-    name: mix test (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}})
+    name: mix test (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}} | Alpine ${{ matrix.alpine }})
     runs-on: ubuntu-latest
     container: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
     env:
