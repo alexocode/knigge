@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [#18](https://github.com/sascha-wolf/knigge/pull/18): Add `default` option to `use Knigge` ([@NickNeck][])
 - [#22](https://github.com/sascha-wolf/knigge/pull/22): Ease contributing by adding a CONTRIBUTING guide and a PULL_REQUEST_TEMPLATE ([@sascha-wolf])
 
+### Changed
+
+- [#19](https://github.com/sascha-wolf/knigge/pull/19): Fix handling of callbacks without brackets ([@NickNeck])
+
 ## [1.3.0] - 2020-11-27
 
 ### Added
