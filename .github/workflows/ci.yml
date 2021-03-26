@@ -170,6 +170,5 @@ jobs:
         with:
           path: .dialyzer/
           key: v1-check_types-dialyzer-plts
-          restore-keys: v1-check_types-dialyzer-plts
 
       - run: mix dialyzer
