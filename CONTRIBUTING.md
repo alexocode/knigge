@@ -33,15 +33,14 @@ Make sure to follow the following guidelines when doing so.
 Here are a few examples:
 
 ```
-* [#14](https://github.com/sascha-wolf/knigge/issues/14): Fix handling of callbacks without brackets ([@NickNeck])
+* [#19](https://github.com/sascha-wolf/knigge/pull/19): Fix handling of callbacks without brackets ([@NickNeck])
 * [#16](https://github.com/sascha-wolf/knigge/pull/16): Migrate CI from CircleCI to GitHub actions ([@sascha-wolf])
 * [#15](https://github.com/sascha-wolf/knigge/pull/15): Add `--app` switch to `mix knigge.verify` ([@polvalente])
 ```
 
 * Mark it up in [Markdown syntax](https://daringfireball.net/projects/markdown/syntax).
 * The entry line should start with `* ` (an asterisk and a space).
-* If the change has a related GitHub issue (e.g. a bug fix for a reported issue), put a link to the issue as `[#123](https://github.com/sascha-wolf/knigge/pull/456): `,
-  otherwise include a link to your pull request (`[#456](https://github.com/sascha-wolf/knigge/pull/456): `)
+* Begin with a link to your pull request (`[#456](https://github.com/sascha-wolf/knigge/pull/456): `)
 * Describe the core idea of the change. The sentence should end with punctuation.
 * If this is a breaking change, mark it with `**(Breaking)**`.
 * At the end of the entry, add an implicit link to your GitHub user page as `([@username])`.
