@@ -17,6 +17,9 @@ defmodule Knigge.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
 
+      # Deps
+      dialyzer: [ignore_warnings: ".dialyzer_ignore.exs"],
+
       # Docs
       name: "Knigge",
       source_url: "https://github.com/sascha-wolf/knigge",
