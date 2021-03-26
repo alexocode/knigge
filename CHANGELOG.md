@@ -20,30 +20,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* [#15](https://github.com/sascha-wolf/knigge/pull/15): Add `--app` switch to `mix knigge.verify` ([@polvalente])
+- [#15](https://github.com/sascha-wolf/knigge/pull/15): Add `--app` switch to `mix knigge.verify` ([@polvalente])
 
 ### Changed
 
-* [#16](https://github.com/sascha-wolf/knigge/pull/16): Migrate CI from CircleCI to GitHub actions ([@sascha-wolf])
+- [#16](https://github.com/sascha-wolf/knigge/pull/16): Migrate CI from CircleCI to GitHub actions ([@sascha-wolf])
 
 
 ## [1.2.0] - 2020-09-07
 
 ### Changed
 
-* Replaced the existence check with `mix knigge.verify`, see [here for details on why](https://hexdocs.pm/knigge/the-existence-check.html) ([@sascha-wolf])
+- Replaced the existence check with `mix knigge.verify`, see [here for details on why](https://hexdocs.pm/knigge/the-existence-check.html) ([@sascha-wolf])
 
 ## [1.1.1] - 2019-10-13
 
 ### Changed
 
-* [#9](https://github.com/sascha-wolf/knigge/pull/9): Avoid warning when callback is defined several times ([@alexcastano])
+- [#9](https://github.com/sascha-wolf/knigge/pull/9): Avoid warning when callback is defined several times ([@alexcastano])
 
 ## [1.1.0] - 2019-10-13
 
 ### Changed
 
-* Renamed `delegate_at` to `delegate_at_runtime?` and changed it to accept a list of environment names instead of only a boolean;
+- Renamed `delegate_at` to `delegate_at_runtime?` and changed it to accept a list of environment names instead of only a boolean;
   the default has been changed to `only: :test` ([@sascha-wolf])
 
 [Unreleased]: https://github.com/sascha-wolf/knigge/compare/v1.3.0...main
