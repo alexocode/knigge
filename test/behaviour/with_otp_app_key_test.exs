@@ -38,8 +38,6 @@ defmodule Behaviour.WithOtpAppKey do
           default: MyApp.SomeModule
       end
 
-    Application.delete_env(:knigge, :working_behaviour)
-
     assert behaviour.__knigge__(:implementation) == MyApp.SomeModule
   end
 
