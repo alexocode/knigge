@@ -129,9 +129,17 @@ defmodule MyGreatBehaviourFacade do
 end
 ```
 
-Compared to the "boilerplate" version above, it's as if you'd written
-`Application.get_env(:my_application, __MODULE__, MyDefaultImplementation)`
-instead of `fetch_env!/2`.
+Compared to the "boilerplate" version above, it's as if you'd written:
+
+```elixir
+  @implementation Application.get_env(:my_application, __MODULE__, MyDefaultImplementation)
+```
+
+instead of:
+
+```elixir
+  @implementation Application.fetch_env!(:my_application, __MODULE__)
+```
 
 #### The `behaviour` key is optional
 
