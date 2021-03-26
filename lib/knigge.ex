@@ -63,9 +63,32 @@ defmodule Knigge do
           otp_app: :my_application
       end
 
+  It's also possible to provide a default implementation:
+
+      defmodule MyGreatBehaviourFacade do
+        use Knigge,
+          behaviour: MyGreatBehaviour,
+          otp_app: :my_application,
+          default: MyDefaultImplementation
+      end
+
+  It's basically as if you'd used `Application.get_env(:my_application, __MODULE__, MyDefaultImplementation)`
+  instead of `fetch_env!/2`.
+
+  Technically even passing the `behaviour` is optional, it defaults to
+  the current `__MODULE__`. This means that the example from above could
+  be shortened even more to:
+
+      defmodule MyGreatBehaviour do
+        use Knigge, otp_app: :my_application
+
+        @callback my_great_callback(my_argument :: any()) :: any()
+      end
+
   Under the hood this compiles down to the explicit delegation visible on the top.
+
   In case you don't want to fetch your implementation from the configuration,
-  `Knigge` also allows you to explicitely pass the implementation of the
+  `Knigge` also allows you to explicitly pass the implementation of the
   behaviour with the aptly named key `implementation`:
 
       defmodule MyGreatBehaviourFacade do

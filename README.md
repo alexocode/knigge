@@ -100,6 +100,20 @@ defmodule MyGreatBehaviourFacade do
 end
 ```
 
+It's also possible to provide a default implementation:
+
+```elixir
+defmodule MyGreatBehaviourFacade do
+  use Knigge,
+    behaviour: MyGreatBehaviour,
+    otp_app: :my_application,
+    default: MyDefaultImplementation
+end
+```
+
+It's basically as if you'd used `Application.get_env(:my_application, __MODULE__, MyDefaultImplementation)`
+instead of `fetch_env!/2`.
+
 Technically even passing the `behaviour` is optional, it defaults to
 the current `__MODULE__`. This means that the example from above could
 be shortened even more to:
