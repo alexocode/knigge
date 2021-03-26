@@ -35,7 +35,7 @@ passing the behaviour which should be "facaded" as an option.
     - [Specifying the `implementation` directly](#specifying-the-implementation-directly)
   - [`defdefault` - Fallback implementations for optional callbacks](#defdefault---fallback-implementations-for-optional-callbacks)
 - [Options](#options)
-- [Verifying your Implementations - `mix knigge.verify`](#verifying-your-implementations---mix-kniggeverify)
+- [Verifying your implementations - `mix knigge.verify`](#verifying-your-implementations---mix-kniggeverify)
 - [Knigge and the `:test` environment](#knigge-and-the-test-environment)
   - [Compiler Warnings](#compiler-warnings)
 
@@ -245,7 +245,7 @@ as option - by default `Knigge` delegates at runtime in your `:test`s.
 
 For further information about options check the [`Knigge.Options` module](https://hexdocs.pm/knigge/Knigge.Options.html).
 
-## Verifying your Implementations - `mix knigge.verify`
+## Verifying your implementations - `mix knigge.verify`
 
 Before version 1.2.0 `Knigge` tried to check at compile time if the implementation of your facade existed.
 Due to the way the Elixir compiler goes about compiling your modules this didn't work as expected - [checkout this page if you're interested in the details](https://hexdocs.pm/knigge/the-existence-check.html).
