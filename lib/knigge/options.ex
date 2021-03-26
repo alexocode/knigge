@@ -239,7 +239,7 @@ defmodule Knigge.Options do
       iex> Knigge.Options.validate!(otp_app: :knigge, delegate_at_runtime?: "test")
       ** (ArgumentError) Knigge received invalid value for `delegate_at_runtime?`. Expected boolean or environment (atom or list of atoms) but received: "test"
   """
-  @spec validate!(raw()) :: no_return
+  @spec validate!(opts :: raw()) :: no_return | opts when opts: raw()
   def validate!(opts) do
     validate_keyword!(opts)
     validate_required!(opts)
