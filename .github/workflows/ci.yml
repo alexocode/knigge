@@ -163,7 +163,7 @@ jobs:
     name: Check Types (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}} | Alpine ${{matrix.alpine}})
     runs-on: ubuntu-latest
     container:
-      image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-
+      image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
       env:
         MIX_ENV: dev
     strategy:
