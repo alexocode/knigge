@@ -12,7 +12,7 @@ env:
 
 jobs:
   publish_to_hex:
-    name: Publish to Hex.pm
+    name: Publish to Hex.pm (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}} | Alpine ${{matrix.alpine}})
     runs-on: ubuntu-latest
     container: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
     strategy:
