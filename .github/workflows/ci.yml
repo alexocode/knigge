@@ -126,3 +126,41 @@ jobs:
       - run: mix compile --warnings-as-errors
       - run: mix format --check-formatted
       - run: mix credo
+
+  check_types:
+    name: Check Types
+    runs-on: ubuntu-latest
+    container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache - deps/
+        uses: actions/cache@v1
+        with:
+          path: deps/
+          key: v1-check_style-deps-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-check_style-deps-
+
+      - name: Install Dependencies
+        run: |
+          mix local.rebar --force
+          mix local.hex --force
+          mix deps.get
+
+      - name: Cache - _build/
+        uses: actions/cache@v1
+        with:
+          path: _build/
+          key: v1-check_style-_build-${{ hashFiles('**/mix.lock') }}
+          restore-keys: v1-check_style-_build-
+
+      - run: mix compile --warnings-as-errors
+
+      - name: Cache - Dialyzer PLTs
+        uses: actions/cache@v1
+        with:
+          path: .dialyzer/
+          key: v1-check_types-dialyzer-plts
+          restore-keys: v1-check_types-dialyzer-plts
+
+      - run: echo 'ContainerID=${{ job.container.id }} | ContainerImage=${{ job.container.image }}' && mix dialyzer
