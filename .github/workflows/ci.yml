@@ -172,7 +172,6 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          echo "MIX_ENV=$MIX_ENV"
           mix local.rebar --force
           mix local.hex --force
           mix deps.get --only "$MIX_ENV"
