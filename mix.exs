@@ -49,8 +49,8 @@ defmodule Knigge.MixProject do
       {:bunt, "~> 0.2"},
 
       # No Runtime
-      {:credo, ">= 1.0.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:credo, ">= 1.0.0", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},
 
       # Test
