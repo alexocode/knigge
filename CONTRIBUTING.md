@@ -33,9 +33,9 @@ Make sure to follow the following guidelines when doing so.
 Here are a few examples:
 
 ```
-* [#14](https://github.com/sascha-wolf/knigge/issues/14): Fix handling of callbacks without brackets ([@NickNeck][])
-* [#16](https://github.com/sascha-wolf/knigge/pull/16): Migrate CI from CircleCI to GitHub actions ([@sascha-wolf][])
-* [#15](https://github.com/sascha-wolf/knigge/pull/15): Add `--app` switch to `mix knigge.verify` ([@polvalente][])
+* [#14](https://github.com/sascha-wolf/knigge/issues/14): Fix handling of callbacks without brackets ([@NickNeck])
+* [#16](https://github.com/sascha-wolf/knigge/pull/16): Migrate CI from CircleCI to GitHub actions ([@sascha-wolf])
+* [#15](https://github.com/sascha-wolf/knigge/pull/15): Add `--app` switch to `mix knigge.verify` ([@polvalente])
 ```
 
 * Mark it up in [Markdown syntax](https://daringfireball.net/projects/markdown/syntax).
@@ -44,7 +44,7 @@ Here are a few examples:
   otherwise include a link to your pull request (`[#456](https://github.com/sascha-wolf/knigge/pull/456): `)
 * Describe the core idea of the change. The sentence should end with punctuation.
 * If this is a breaking change, mark it with `**(Breaking)**`.
-* At the end of the entry, add an implicit link to your GitHub user page as `([@username][])`.
+* At the end of the entry, add an implicit link to your GitHub user page as `([@username])`.
 * If this is your first contribution to Knigge, add a link definition for the implicit link to the bottom of the changelog as `[@username]: https://github.com/username`.
 
 *These guidelines were by the [Contribution guidelines of the rubocop project](https://github.com/rubocop/rubocop/blob/master/CONTRIBUTING.md).*
