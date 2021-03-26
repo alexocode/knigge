@@ -14,14 +14,12 @@ jobs:
   publish_to_hex:
     name: Publish to Hex.pm
     runs-on: ubuntu-latest
-    container: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - alpine: 3.11.6
-            elixir: 1.11.2
-            otp: 22.3.4.3
+    container:
+      image: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+      env:
+        VERSION_ALPINE: 3.11.6
+        VERSION_ELIXIR: 1.11.2
+        VERSION_OTP: 22.3.4.3
     steps:
       - uses: actions/checkout@v2
 
@@ -34,8 +32,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: deps/
-          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
+          key: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_VERSION_DEPS }}-deps-env:${{ env.MIX_ENV}}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
 
       - name: Install Dependencies
         run: |
@@ -47,8 +45,8 @@ jobs:
         uses: actions/cache@v1
         with:
           path: _build/
-          key: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ matrix.alpine }}-elixir:${{ matrix.elixir }}-otp:${{ matrix.otp }}-
+          key: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${ env.CACHE_VERSION_BUILD }}-_build-env:${{ env.MIX_ENV}}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
 
       - run: mix compile --warnings-as-errors
 
