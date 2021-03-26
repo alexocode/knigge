@@ -170,7 +170,6 @@ defmodule Knigge.Verification.Context do
         iex> #{module}.is_error(context)
         true
     """
-    @spec is_error(t()) :: boolean()
     defguard is_error(context)
              when :erlang.is_map_key(:__struct__, context) and
                     :erlang.map_get(:__struct__, context) == __MODULE__ and
