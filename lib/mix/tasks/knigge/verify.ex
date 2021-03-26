@@ -53,29 +53,40 @@ defmodule Mix.Tasks.Knigge.Verify do
   def run(raw_args) do
     Mix.Task.run("compile")
 
-    case OptionParser.parse(raw_args, strict: [app: :string]) do
-      {opts, _argv, []} ->
-        opts
-        |> Keyword.get_lazy(:app, &calling_app/0)
-        |> run_for()
-        |> exit_with()
+    with {:ok, opts} <- parse(raw_args),
+         :ok <- do_run(opts) do
+      :ok
+    else
+      {:error, reason} ->
+        maybe_print_error(reason)
 
-      {_parsed, _argv, errors} ->
-        unknown_switches(errors)
+        exit({:shutdown, to_exit_code(reason)})
     end
   end
 
-  defp calling_app, do: Mix.Project.get().project()[:app]
+  defp parse(raw_args) do
+    case OptionParser.parse(raw_args, strict: [app: :string]) do
+      {opts, _argv, []} -> {:ok, opts}
+      {_parsed, _argv, errors} -> unknown_switches(errors)
+    end
+  end
 
   defp unknown_switches(errors) do
     options =
       errors
-      |> Keyword.keys()
+      |> Enum.map(&elem(&1, 0))
       |> Enum.join(", ")
 
-    error("Unknown switch(es) received: " <> options)
-    exit_with({:error, :unknown_options})
+    {:error, {:unknown_options, "Unknown switch(es) received: " <> options}}
   end
+
+  defp do_run(opts) do
+    opts
+    |> Keyword.get_lazy(:app, &calling_app/0)
+    |> run_for()
+  end
+
+  defp calling_app, do: Mix.Project.get().project()[:app]
 
   defp run_for(app) when is_binary(app) do
     app
@@ -89,6 +100,7 @@ defmodule Mix.Tasks.Knigge.Verify do
       |> begin_verification()
       |> Verification.run()
       |> finish_verification()
+      |> to_result_tuple()
     else
       {:error, {:unknown_app, app}} ->
         error("Unable to load modules for #{app || "current app"}, are you sure the app exists?")
@@ -163,38 +175,26 @@ defmodule Mix.Tasks.Knigge.Verify do
     context
   end
 
-  defp exit_with(%Context{error: :missing_modules} = context) do
-    error(
-      :stderr,
-      "Validation failed for #{length(context.missing)}/#{length(context.modules)} facades."
-    )
-
-    exit_with({:error, :missing_modules})
-  end
-
-  if Knigge.OTP.release() >= 21 do
-    defp exit_with(%Context{} = context) when Context.is_error(context) do
-      exit_with({:error, context.error})
-    end
-  else
-    defp exit_with(%Context{} = context) do
-      if Context.error?(context) do
-        exit_with({:error, context.error})
-      else
-        :ok
-      end
+  defp to_result_tuple(%Context{} = context) do
+    if Context.error?(context) do
+      {:error, context.error}
+    else
+      :ok
     end
   end
 
-  defp exit_with({:error, reason}) when reason in @exit_reasons do
-    exit({:shutdown, @exit_codes[reason]})
+  defp maybe_print_error(%Context{error: :missing_modules} = context) do
+    error("Validation failed for #{length(context.missing)}/#{length(context.modules)} facades.")
   end
 
-  defp exit_with({:error, unknown_reason}) do
+  defp maybe_print_error(%Context{}), do: :ok
+  defp maybe_print_error({:unknown_switches, message}), do: error(message)
+
+  defp maybe_print_error(unknown_reason) do
     error("An unknown error occurred: #{inspect(unknown_reason)}")
-
-    exit({:shutdown, @unknown_error_code})
   end
 
-  defp exit_with(_), do: :ok
+  defp to_exit_code(%Context{error: reason}), do: to_exit_code(reason)
+  defp to_exit_code(reason) when reason in @exit_reasons, do: @exit_codes[reason]
+  defp to_exit_code(_unknown_reason), do: @unknown_error_code
 end

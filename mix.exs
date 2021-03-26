@@ -17,6 +17,9 @@ defmodule Knigge.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
 
+      # Deps
+      dialyzer: dialyzer(),
+
       # Docs
       name: "Knigge",
       source_url: "https://github.com/sascha-wolf/knigge",
@@ -46,8 +49,8 @@ defmodule Knigge.MixProject do
       {:bunt, "~> 0.2"},
 
       # No Runtime
-      {:credo, ">= 1.0.0", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0.0-rc.6", only: [:dev], runtime: false},
+      {:credo, ">= 1.0.0", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.23", only: :dev, runtime: false},
 
       # Test
@@ -56,6 +59,13 @@ defmodule Knigge.MixProject do
 
       # Docs
       {:inch_ex, ">= 0.0.0", only: :docs}
+    ]
+  end
+
+  defp dialyzer do
+    [
+      ignore_warnings: ".dialyzer_ignore.exs",
+      plt_file: {:no_warn, ".dialyzer/dialyzer.plt"}
     ]
   end
 
