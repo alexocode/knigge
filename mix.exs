@@ -112,7 +112,7 @@ defmodule Knigge.MixProject do
 
   def package do
     [
-      files: ["lib", "mix.exs", "LICENSE*", "README*", "version"],
+      files: ["lib", "mix.exs", "CHANGELOG*", "LICENSE*", "README*", "version"],
       licenses: ["MIT"],
       links: %{
         "GitHub" => "https://github.com/sascha-wolf/knigge"
