@@ -46,4 +46,4 @@ Here are a few examples:
 * At the end of the entry, add an implicit link to your GitHub user page as `([@username])`.
 * If this is your first contribution to Knigge, add a link definition for the implicit link to the bottom of the changelog as `[@username]: https://github.com/username`.
 
-*These guidelines were by the [Contribution guidelines of the rubocop project](https://github.com/rubocop/rubocop/blob/master/CONTRIBUTING.md).*
+*These guidelines were inspired by the [Contribution guidelines of the rubocop project](https://github.com/rubocop/rubocop/blob/master/CONTRIBUTING.md).*
