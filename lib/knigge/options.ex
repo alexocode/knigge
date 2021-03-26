@@ -76,6 +76,7 @@ defmodule Knigge.Options do
   @type optional :: [
           behaviour: behaviour(),
           config_key: config_key(),
+          default: default(),
           delegate_at_runtime?: boolean_or_envs(),
           do_not_delegate: do_not_delegate(),
           warn: boolean_or_envs()
@@ -84,6 +85,7 @@ defmodule Knigge.Options do
   @type behaviour :: module()
   @type boolean_or_envs :: boolean() | envs() | [only: envs()] | [except: envs()]
   @type config_key :: atom()
+  @type default :: module()
   @type delegate_at :: :compile_time | :runtime
   @type do_not_delegate :: keyword(arity())
   @type envs :: atom() | list(atom())
@@ -92,6 +94,7 @@ defmodule Knigge.Options do
   @type t :: %__MODULE__{
           implementation: module() | {:config, otp_app(), config_key()},
           behaviour: behaviour(),
+          default: default(),
           delegate_at_runtime?: boolean(),
           do_not_delegate: do_not_delegate(),
           warn: boolean()
@@ -99,6 +102,7 @@ defmodule Knigge.Options do
 
   defstruct [
     :behaviour,
+    :default,
     :delegate_at_runtime?,
     :do_not_delegate,
     :implementation,
@@ -301,6 +305,7 @@ defmodule Knigge.Options do
 
   @option_types [
     behaviour: :module,
+    default: :module,
     delegate_at_runtime?: :envs,
     do_not_delegate: :keyword,
     implementation: :module,
