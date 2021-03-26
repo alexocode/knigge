@@ -85,7 +85,7 @@ defmodule Knigge.Options do
   @type behaviour :: module()
   @type boolean_or_envs :: boolean() | envs() | [only: envs()] | [except: envs()]
   @type config_key :: atom()
-  @type default :: module()
+  @type default :: nil | module()
   @type delegate_at :: :compile_time | :runtime
   @type do_not_delegate :: keyword(arity())
   @type envs :: atom() | list(atom())
