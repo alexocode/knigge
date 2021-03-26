@@ -13,7 +13,7 @@ env:
 
 jobs:
   mix_test:
-    name: mix test (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}} | Alpine ${{matrix.alpine}})
+    name: mix test (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}})
     runs-on: ubuntu-latest
     container:
       image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
@@ -71,7 +71,7 @@ jobs:
       - run: mix test
 
   coverage:
-    name: Collect Test Coverage (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}} | Alpine ${{matrix.alpine}})
+    name: Collect Test Coverage
     runs-on: ubuntu-latest
     container:
       image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
@@ -119,7 +119,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   check_style:
-    name: Check Style (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}} | Alpine ${{matrix.alpine}})
+    name: Check Style
     runs-on: ubuntu-latest
     container:
       image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
@@ -160,7 +160,7 @@ jobs:
       - run: mix credo
 
   check_types:
-    name: Check Types (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}} | Alpine ${{matrix.alpine}})
+    name: Check Types
     runs-on: ubuntu-latest
     container:
       image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
