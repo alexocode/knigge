@@ -6,14 +6,14 @@ on:
     branches:
       - main
 
-env:
-  MIX_ENV: test
-
 jobs:
   mix_test:
     name: mix test (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}})
     runs-on: ubuntu-latest
-    container: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-3.11.6
+    container:
+      image: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-3.11.6
+      env:
+        MIX_ENV: test
     strategy:
       fail-fast: false
       matrix:
@@ -46,7 +46,7 @@ jobs:
         run: |
           mix local.rebar --force
           mix local.hex --force
-          mix deps.get
+          mix deps.get --only "$MIX_ENV"
 
       - name: Cache - _build/
         uses: actions/cache@v1
@@ -61,7 +61,10 @@ jobs:
   coverage:
     name: Collect Test Coverage
     runs-on: ubuntu-latest
-    container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+    container:
+      image: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+      env:
+        MIX_ENV: test
     steps:
       - name: Install git (required for mix coveralls.github)
         run: apk add --no-cache git
@@ -82,7 +85,7 @@ jobs:
         run: |
           mix local.rebar --force
           mix local.hex --force
-          mix deps.get
+          mix deps.get --only "$MIX_ENV"
 
       - name: Cache - _build/
         uses: actions/cache@v1
@@ -99,7 +102,10 @@ jobs:
   check_style:
     name: Check Style
     runs-on: ubuntu-latest
-    container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+    container:
+      image: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+      env:
+        MIX_ENV: dev
     steps:
       - uses: actions/checkout@v2
 
@@ -114,7 +120,7 @@ jobs:
         run: |
           mix local.rebar --force
           mix local.hex --force
-          mix deps.get
+          mix deps.get --only "$MIX_ENV"
 
       - name: Cache - _build/
         uses: actions/cache@v1
@@ -130,7 +136,10 @@ jobs:
   check_types:
     name: Check Types
     runs-on: ubuntu-latest
-    container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+    container:
+      image: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+      env:
+        MIX_ENV: dev
     steps:
       - uses: actions/checkout@v2
 
@@ -145,7 +154,7 @@ jobs:
         run: |
           mix local.rebar --force
           mix local.hex --force
-          mix deps.get
+          mix deps.get --only "$MIX_ENV"
 
       - name: Cache - _build/
         uses: actions/cache@v1
@@ -163,4 +172,4 @@ jobs:
           key: v1-check_types-dialyzer-plts
           restore-keys: v1-check_types-dialyzer-plts
 
-      - run: echo 'ContainerID=${{ job.container.id }} | ContainerImage=${{ job.container.image }}' && mix dialyzer
+      - run: mix dialyzer
