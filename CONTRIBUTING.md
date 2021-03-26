@@ -24,7 +24,7 @@ Make sure to follow the following guidelines when doing so.
 * Use the same coding conventions as the rest of the project.
 * Commit and push until you are happy with your contribution.
 * Make sure to add tests for it. So we can avoid that it breaks accidentially in the future.
-* Add an entry to the [Changelog](CHANGELOG.md) accordingly. See [changelog entry format](#changelog-entry-format).
+* Add an entry to the [Changelog](./CHANGELOG.md) accordingly. See [changelog entry format](#changelog-entry-format).
 * Open a [pull request](https://help.github.com/articles/about-pull-requests) that relates to *only* one subject with a clear title
   and description in grammatically correct, complete sentences.
 
@@ -46,4 +46,4 @@ Here are a few examples:
 * At the end of the entry, add an implicit link to your GitHub user page as `([@username])`.
 * If this is your first contribution to Knigge, add a link definition for the implicit link to the bottom of the changelog as `[@username]: https://github.com/username`.
 
-*These guidelines were inspired by the [Contribution guidelines of the rubocop project](https://github.com/rubocop/rubocop/blob/master/CONTRIBUTING.md).*
+*These guidelines were inspired by the [contribution guidelines of the rubocop project](https://github.com/rubocop/rubocop/blob/master/CONTRIBUTING.md).*
