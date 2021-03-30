@@ -128,8 +128,8 @@ defmodule Knigge.Options do
       opts
       |> map_deprecated()
       |> validate!()
-      |> with_defaults()
       |> transform(with_env: env)
+      |> with_defaults()
 
     struct(__MODULE__, opts)
   end
@@ -209,6 +209,8 @@ defmodule Knigge.Options do
   defp transform(key, envs, with_env: env)
        when key in [:delegate_at_runtime?, :warn],
        do: active_env?(env, envs)
+
+  defp transform(:config_key, value, with_env: _), do: List.wrap(value)
 
   defp transform(_key, value, with_env: _), do: value
 
@@ -317,7 +319,7 @@ defmodule Knigge.Options do
     do_not_delegate: :keyword,
     implementation: :module,
     otp_app: :atom,
-    config_key: :keys,
+    config_key: [:atom, {:list_of, :atom}],
     warn: :envs
   ]
 
@@ -330,6 +332,14 @@ defmodule Knigge.Options do
     |> Keyword.fetch!(name)
     |> valid_value?(value)
   end
+
+  defp valid_value?(types, value) when is_list(types),
+    do: Enum.any?(types, fn type -> valid_value?(type, value) end)
+
+  defp valid_value?({:list_of, type}, values) when is_list(values),
+    do: Enum.all?(values, fn value -> valid_value?(type, value) end)
+
+  defp valid_value?({:list_of, _type}, _values), do: false
 
   defp valid_value?(:atom, value), do: is_atom(value)
   defp valid_value?(:boolean, value), do: is_boolean(value)
@@ -355,7 +365,7 @@ defmodule Knigge.Options do
       :keyword ->
         "keyword list"
 
-      :keys ->
+      [:atom, {:list_of, :atom}] ->
         "atom or list of atoms"
 
       other ->
