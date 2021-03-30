@@ -16,9 +16,9 @@ defmodule Behaviour.WithOtpAppKey do
   test "raises an ArgumentError with an invalid :config_key" do
     Application.put_env(:knigge, :foo, SomeModule)
 
-    message = """
+    message = ~r"""
     could not fetch application environment :bar for application :knigge \
-    because configuration at :bar was not set\
+    because configuration .* :bar was not set\
     """
 
     assert_raise ArgumentError, message, fn ->
