@@ -236,7 +236,7 @@ results in a call looking like this: `Application.fetch_env!(otp_app, config_key
 
 By default `Knigge` does as much work as possible at compile time. This will
 be fine most of the time. In case you want to swap out the implementation at
-runtime - by calling `Application.put_env/2` - you can force `Knigge` to do all
+runtime - by calling `Application.put_env/3` - you can force `Knigge` to do all
 delegation at runtime. As you might expect this incurs runtime overhead,
 since the implementing module will have to be loaded for each call.
 
