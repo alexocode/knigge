@@ -7,7 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.4.0] - 2020-03-26
+## [1.4.1] - 2021-10-03
+
+### Changed
+
+- [#26](https://github.com/sascha-wolf/knigge/issue/26): Fix upgrade building by tagging `bunt` as `runtime: false`
+
+## [1.4.0] - 2021-03-26
 
 ### Added
 
@@ -48,7 +54,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Renamed `delegate_at` to `delegate_at_runtime?` and changed it to accept a list of environment names instead of only a boolean;
   the default has been changed to `only: :test` ([@sascha-wolf])
 
-[Unreleased]: https://github.com/sascha-wolf/knigge/compare/v1.4.0...main
+[Unreleased]: https://github.com/sascha-wolf/knigge/compare/v1.4.1...main
+[1.4.1]: https://github.com/sascha-wolf/knigge/compare/v1.4.0...v1.4.1
 [1.4.0]: https://github.com/sascha-wolf/knigge/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/sascha-wolf/knigge/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/sascha-wolf/knigge/compare/v1.1.1...v1.2.0
