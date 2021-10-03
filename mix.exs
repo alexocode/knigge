@@ -55,7 +55,7 @@ defmodule Knigge.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:bunt, "~> 0.2"},
+      {:bunt, "~> 0.2", runtime: false},
 
       # No Runtime
       {:credo, ">= 1.0.0", only: :dev, runtime: false},
