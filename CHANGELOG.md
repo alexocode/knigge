@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- [#26](https://github.com/sascha-wolf/knigge/issue/26): Fix upgrade building by tagging `bunt` as `runtime: false`
+- [#26](https://github.com/sascha-wolf/knigge/issues/26): Fix upgrade building by tagging `bunt` as `runtime: false`
 
 ## [1.4.0] - 2021-03-26
 
