@@ -46,6 +46,9 @@ jobs:
           - alpine: 3.11.6
             elixir: 1.11.2
             otp: 23.0.2
+          - alpine: 3.14.0
+            elixir: 1.12.3
+            erlang: 24.1.1
     steps:
       - uses: actions/checkout@v2
 
