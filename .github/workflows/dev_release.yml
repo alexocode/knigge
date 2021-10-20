@@ -1,0 +1,61 @@
+name: Dev Release
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  MIX_ENV: dev
+  REQUIRE_VERSION_FILE: true
+  CACHE_PREFIX_DEPS: v1-deps
+  CACHE_PREFIX_BUILD: v1-_build
+
+jobs:
+  publish_to_hex:
+    name: Publish to Hex.pm
+    runs-on: ubuntu-latest
+    container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
+    env:
+      VERSION_ALPINE: 3.11.6
+      VERSION_ELIXIR: 1.11.2
+      VERSION_OTP: 22.3.4.3
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: rickstaa/action-get-semver@v1
+        id: update_semver
+        with:
+          bump_level: "minor"
+
+      - name: Update semver and write the release version file
+        run: |
+          echo "Create version file for ${{ steps.update_semver.outputs.next-version }}-dev"
+          echo "${{ steps.update_semver.outputs.next-version }}-dev > version"
+
+      - name: Cache - deps/
+        uses: actions/cache@v1
+        with:
+          path: deps/
+          key: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
+
+      - name: Install Dependencies
+        run: |
+          mix local.rebar --force
+          mix local.hex --force
+          mix deps.get --only "$MIX_ENV"
+
+      - name: Cache - _build/
+        uses: actions/cache@v1
+        with:
+          path: _build/
+          key: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
+
+      - run: mix compile --warnings-as-errors
+
+      - name: Publish to Hex.pm
+        run: mix hex.publish --yes
+        env:
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
