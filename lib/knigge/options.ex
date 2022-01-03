@@ -46,7 +46,7 @@ defmodule Knigge.Options do
   __Default__: `nil`; `Knigge` will raise an error when no implementation is configured.
 
   ### `delegate_at_runtime?`
-  A switch to move delegation to runtime, by defauly `Knigge` does as much work as possible at compile time.
+  A switch to move delegation to runtime, by default `Knigge` does as much work as possible at compile time.
   Accepts:
 
   - a boolean (`true` always delegate at runtime | `false` always at compile time)
@@ -54,9 +54,7 @@ defmodule Knigge.Options do
   - `[only: <envs>]` - equivalent to the option above
   - `[except: <envs>]` - only delegates at runtime if the current environment is __not__ contained in the list
 
-  __Default__: `Application.get_env(:knigge, :delegate_at_runtime?, #{
-    inspect(@defaults[:delegate_at_runtime?])
-  })`
+  __Default__: `Application.get_env(:knigge, :delegate_at_runtime?, #{inspect(@defaults[:delegate_at_runtime?])})`
 
   ### `do_not_delegate`
   A keyword list defining callbacks for which no delegation should happen.
@@ -156,9 +154,7 @@ defmodule Knigge.Options do
 
         message when is_binary(message) ->
           IO.warn(
-            "Knigge encountered the deprecated option `#{key}`, this option is no longer supported; #{
-              message
-            }."
+            "Knigge encountered the deprecated option `#{key}`, this option is no longer supported; #{message}."
           )
 
           nil
@@ -178,13 +174,7 @@ defmodule Knigge.Options do
 
   @doc """
   Applies the defaults to the given options:
-  #{
-    @defaults
-    |> Enum.map(fn {key, value} ->
-      "  - #{key} = #{inspect(value)}"
-    end)
-    |> Enum.join("\n")
-  }
+  #{@defaults |> Enum.map(fn {key, value} -> "  - #{key} = #{inspect(value)}" end) |> Enum.join("\n")}
   """
   @spec with_defaults(raw()) :: raw()
   def with_defaults(opts) do
