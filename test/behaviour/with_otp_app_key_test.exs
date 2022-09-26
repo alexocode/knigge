@@ -29,7 +29,7 @@ defmodule Behaviour.WithOtpAppKey do
 
   test "raises an ArgumentError with an invalid :config_key path" do
     Application.put_env(:knigge, :foo, module: SomeModule)
-    message = "could not fetch application environment [:foo, :bar] for application :knigge"
+    message = ~r/could not fetch application environment \[:foo, :bar\] for application :knigge.*/
 
     assert_raise ArgumentError, message, fn ->
       defmodule MissingConfig do
@@ -97,6 +97,23 @@ defmodule Behaviour.WithOtpAppKey do
       end
 
     Application.delete_env(:knigge, :working_behaviour)
+
+    assert behaviour.__knigge__(:implementation) == SomeModule
+  end
+
+  test "ignores default if module is in config_key path" do
+    Application.put_env(:knigge, :sys, module: SomeModule)
+
+    # Should not raise
+    behaviour =
+      defmodule_salted WorkingBehaviour do
+        use Knigge,
+          otp_app: :knigge,
+          config_key: [:sys, :module],
+          default: AnotherModule
+      end
+
+    Application.delete_env(:knigge, :sys, module: SomeModule)
 
     assert behaviour.__knigge__(:implementation) == SomeModule
   end
