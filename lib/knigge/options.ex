@@ -365,6 +365,8 @@ defmodule Knigge.Options do
       :keyword ->
         "keyword list"
 
+      # For now we explicitly match on the "or" option, as soon as we add further 
+      # "or"ed options this ought to be refactored to something more general purpose
       [:atom, {:list_of, :atom}] ->
         "atom or list of atoms"
 
