@@ -1,4 +1,4 @@
-# Just a test
+# Just a test2
 defmodule Knigge do
   @moduledoc """
   An opinionated way of dealing with behaviours.
