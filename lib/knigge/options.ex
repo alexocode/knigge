@@ -174,7 +174,7 @@ defmodule Knigge.Options do
 
   @doc """
   Applies the defaults to the given options:
-  #{@defaults |> Enum.map(fn {key, value} -> "  - #{key} = #{inspect(value)}" end) |> Enum.join("\n")}
+  #{Enum.map_join(@defaults, "\n", fn {key, value} -> "  - `#{key} = #{inspect(value)}`" end)}
   """
   @spec with_defaults(raw()) :: raw()
   def with_defaults(opts) do

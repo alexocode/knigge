@@ -72,10 +72,7 @@ defmodule Mix.Tasks.Knigge.Verify do
   end
 
   defp unknown_switches(errors) do
-    options =
-      errors
-      |> Enum.map(&elem(&1, 0))
-      |> Enum.join(", ")
+    options = Enum.map_join(errors, ", ", &elem(&1, 0))
 
     {:error, {:unknown_options, "Unknown switch(es) received: " <> options}}
   end
