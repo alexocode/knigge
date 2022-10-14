@@ -74,7 +74,7 @@ defmodule Knigge.MixProject do
   defp dialyzer do
     [
       ignore_warnings: ".dialyzer_ignore.exs",
-      plt_add_apps: [:bunt],
+      plt_add_apps: [:bunt, :mix],
       plt_file: {:no_warn, ".dialyzer/dialyzer.plt"}
     ]
   end
