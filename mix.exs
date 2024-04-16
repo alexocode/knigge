@@ -1,6 +1,8 @@
 defmodule Knigge.MixProject do
   use Mix.Project
 
+  @repo "https://github.com/alexocode/knigge"
+
   def project do
     [
       app: :knigge,
@@ -23,8 +25,8 @@ defmodule Knigge.MixProject do
 
       # Docs
       name: "Knigge",
-      source_url: "https://github.com/sascha-wolf/knigge",
-      homepage_url: "https://github.com/sascha-wolf/knigge",
+      source_url: @repo,
+      homepage_url: @repo,
 
       # Hex
       description: description(),
@@ -92,7 +94,7 @@ defmodule Knigge.MixProject do
     [
       main: "Knigge",
       source_ref: "v#{version()}",
-      source_url: "https://github.com/sascha-wolf/knigge",
+      source_url: @repo,
       extras: @extras,
       groups_for_modules: [
         "Overview & Configuration": [
@@ -116,9 +118,9 @@ defmodule Knigge.MixProject do
       files: ["lib", "mix.exs", "CHANGELOG*", "LICENSE*", "README*", "version"],
       licenses: ["MIT"],
       links: %{
-        "GitHub" => "https://github.com/sascha-wolf/knigge"
+        "GitHub" =>@repo
       },
-      maintainers: ["Sascha Wolf <swolf.dev@gmail.com>"]
+      maintainers: ["Alex Wolf <craft@alexocode.dev>"]
     ]
   end
 
