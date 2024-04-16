@@ -118,7 +118,7 @@ defmodule Knigge.MixProject do
       files: ["lib", "mix.exs", "CHANGELOG*", "LICENSE*", "README*", "version"],
       licenses: ["MIT"],
       links: %{
-        "GitHub" =>@repo
+        "GitHub" => @repo
       },
       maintainers: ["Alex Wolf <craft@alexocode.dev>"]
     ]
