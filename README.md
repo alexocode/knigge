@@ -7,9 +7,6 @@
 [![Featured - ElixirRadar](https://img.shields.io/badge/featured-ElixirRadar-543A56)](https://app.rdstation.com.br/mail/0ddee1c8-2ce9-405b-b95f-09c883099090?utm_campaign=elixir_radar_202&utm_medium=email&utm_source=RD+Station)
 [![Featured - ElixirWeekly](https://img.shields.io/badge/featured-ElixirWeekly-875DB0)](https://elixirweekly.net/issues/161)
 
-*Sponsored by*  
-[![BetterDoc](betterdoc.png)](https://www.betterdoc.org/)
-
 An opinionated way of dealing with behaviours.
 
 Opinionated means that it offers an easy way of defining a "facade" for a
