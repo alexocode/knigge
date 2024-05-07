@@ -1,197 +1,123 @@
+# Created with GitHubActions version 0.2.1
 name: CI
-
-on:
-  pull_request:
-  push:
-    branches:
-      - main
-
 env:
-  CACHE_PREFIX_DEPS: v1-deps
-  CACHE_PREFIX_BUILD: v1-_build
-  CACHE_PREFIX_DIALYZER: v1-dialyzer
-
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+on:
+  - pull_request
+  - push
 jobs:
-  mix_test:
-    name: mix test (Erlang/OTP ${{matrix.otp}} | Elixir ${{matrix.elixir}} | Alpine ${{ matrix.alpine }})
+  linux:
+    name: Test on Ubuntu (Elixir ${{ matrix.elixir }}, OTP ${{ matrix.otp }})
     runs-on: ubuntu-latest
-    container: hexpm/elixir:${{ matrix.elixir }}-erlang-${{ matrix.otp }}-alpine-${{ matrix.alpine }}
-    env:
-      MIX_ENV: test
-      VERSION_ALPINE: ${{ matrix.alpine }}
-      VERSION_ELIXIR: ${{ matrix.elixir }}
-      VERSION_OTP: ${{ matrix.otp }}
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - alpine: 3.11.6
-            elixir: 1.7.4
-            otp: 20.3.8.19
-          - alpine: 3.11.6
-            elixir: 1.8.2
-            otp: 20.3.8.19
-          - alpine: 3.11.6
-            elixir: 1.9.4
-            otp: 20.3.8.19
-          - alpine: 3.11.6
-            elixir: 1.9.4
-            otp: 21.3.8.16
-          - alpine: 3.11.6
-            elixir: 1.10.3
-            otp: 21.3.8.16
-          - alpine: 3.11.6
-            elixir: 1.11.2
-            otp: 22.3.4.3
-          - alpine: 3.11.6
-            elixir: 1.11.2
-            otp: 23.0.2
-          - alpine: 3.14.0
-            elixir: 1.12.3
-            otp: 24.1.1
+        elixir:
+          - '1.7.4'
+          - '1.8.2'
+          - '1.9.4'
+          - '1.10.4'
+          - '1.11.4'
+          - '1.12.3'
+          - '1.13.4'
+          - '1.14.0'
+        otp:
+          - '20.3'
+          - '21.3'
+          - '22.3'
+          - '23.3'
+          - '24.3'
+          - '25.1'
+        exclude:
+          - elixir: '1.7.4'
+            otp: '23.3'
+          - elixir: '1.7.4'
+            otp: '24.3'
+          - elixir: '1.7.4'
+            otp: '25.1'
+          - elixir: '1.8.2'
+            otp: '23.3'
+          - elixir: '1.8.2'
+            otp: '24.3'
+          - elixir: '1.8.2'
+            otp: '25.1'
+          - elixir: '1.9.4'
+            otp: '23.3'
+          - elixir: '1.9.4'
+            otp: '24.3'
+          - elixir: '1.9.4'
+            otp: '25.1'
+          - elixir: '1.10.4'
+            otp: '20.3'
+          - elixir: '1.10.4'
+            otp: '24.3'
+          - elixir: '1.10.4'
+            otp: '25.1'
+          - elixir: '1.11.4'
+            otp: '20.3'
+          - elixir: '1.11.4'
+            otp: '25.1'
+          - elixir: '1.12.3'
+            otp: '20.3'
+          - elixir: '1.12.3'
+            otp: '21.3'
+          - elixir: '1.12.3'
+            otp: '25.1'
+          - elixir: '1.13.4'
+            otp: '20.3'
+          - elixir: '1.13.4'
+            otp: '21.3'
+          - elixir: '1.14.0'
+            otp: '20.3'
+          - elixir: '1.14.0'
+            otp: '21.3'
+          - elixir: '1.14.0'
+            otp: '22.3'
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache - deps/
-        uses: actions/cache@v1
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Elixir
+        uses: erlef/setup-beam@v1
         with:
-          path: deps/
-          key: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
-
-      - name: Install Dependencies
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          mix deps.get --only "$MIX_ENV"
-
-      - name: Cache - _build/
-        uses: actions/cache@v1
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+      - name: Restore deps
+        uses: actions/cache@v2
         with:
-          path: _build/
-          key: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
-
-      - run: mix compile --warnings-as-errors
-      - run: mix test
-
-  coverage:
-    name: Collect Test Coverage
-    runs-on: ubuntu-latest
-    container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
-    env:
-      MIX_ENV: test
-      VERSION_ALPINE: 3.11.6
-      VERSION_ELIXIR: 1.11.2
-      VERSION_OTP: 22.3.4.3
-    steps:
-      - name: Install git (required for mix coveralls.github)
-        run: apk add --no-cache git
-
-      # mix coveralls.github uses git to fetch the pr head so we ensure the whole history is available
-      - uses: actions/checkout@v2
+          path: deps
+          key: deps-${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - name: Restore _build
+        uses: actions/cache@v2
         with:
-          fetch-depth: 0
-
-      - name: Cache - deps/
-        uses: actions/cache@v1
+          path: _build
+          key: _build-${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+      - name: Restore .dialyzer
+        uses: actions/cache@v2
         with:
-          path: deps/
-          key: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP}}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP}}-
-
-      - name: Install Dependencies
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          mix deps.get --only "$MIX_ENV"
-
-      - name: Cache - _build/
-        uses: actions/cache@v1
-        with:
-          path: _build/
-          key: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
-
-      - run: mix compile --warnings-as-errors
-      - run: mix coveralls.github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  check_style:
-    name: Check Style
-    runs-on: ubuntu-latest
-    container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
-    env:
-      MIX_ENV: dev
-      VERSION_ALPINE: 3.11.6
-      VERSION_ELIXIR: 1.11.2
-      VERSION_OTP: 22.3.4.3
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache - deps/
-        uses: actions/cache@v1
-        with:
-          path: deps/
-          key: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
-
-      - name: Install Dependencies
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          mix deps.get --only "$MIX_ENV"
-
-      - name: Cache - _build/
-        uses: actions/cache@v1
-        with:
-          path: _build/
-          key: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
-
-      - run: mix compile --warnings-as-errors
-      - run: mix format --check-formatted
-      - run: mix credo
-
-  check_types:
-    name: Check Types
-    runs-on: ubuntu-latest
-    container: hexpm/elixir:1.11.2-erlang-22.3.4.3-alpine-3.11.6
-    env:
-      MIX_ENV: dev
-      VERSION_ALPINE: 3.11.6
-      VERSION_ELIXIR: 1.11.2
-      VERSION_OTP: 22.3.4.3
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Cache - deps/
-        uses: actions/cache@v1
-        with:
-          path: deps/
-          key: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_PREFIX_DEPS }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
-
-      - name: Install Dependencies
-        run: |
-          mix local.rebar --force
-          mix local.hex --force
-          mix deps.get --only "$MIX_ENV"
-
-      - name: Cache - _build/
-        uses: actions/cache@v1
-        with:
-          path: _build/
-          key: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ env.CACHE_PREFIX_BUILD }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}-
-
-      - run: mix compile --warnings-as-errors
-
-      - name: Cache - Dialyzer PLTs
-        uses: actions/cache@v1
-        with:
-          path: .dialyzer/
-          key: ${{ env.CACHE_PREFIX_DIALYZER }}-env:${{ env.MIX_ENV }}-alpine:${{ env.VERSION_ALPINE }}-elixir:${{ env.VERSION_ELIXIR }}-otp:${{ env.VERSION_OTP }}
-
-      - run: mix dialyzer
+          path: .dialyzer
+          key: .dialyzer-${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
+        if: ${{ contains(matrix.elixir, '1.14.0') && contains(matrix.otp, '25.1') }}
+      - name: Get dependencies
+        run: mix deps.get
+      - name: Compile dependencies
+        run: MIX_ENV=test mix deps.compile
+      - name: Compile project
+        run: MIX_ENV=test mix compile --warnings-as-errors
+      - name: Check unused dependencies
+        if: ${{ contains(matrix.elixir, '1.14.0') && contains(matrix.otp, '25.1') }}
+        run: MIX_ENV=test mix deps.unlock --check-unused
+      - name: Check code format
+        if: ${{ contains(matrix.elixir, '1.14.0') && contains(matrix.otp, '25.1') }}
+        run: MIX_ENV=test mix format --check-formatted
+      - name: Lint code
+        if: ${{ contains(matrix.elixir, '1.14.0') && contains(matrix.otp, '25.1') }}
+        run: MIX_ENV=test mix credo --strict
+      - name: Run tests
+        run: MIX_ENV=test mix test
+        if: ${{ !(contains(matrix.elixir, '1.14.0') && contains(matrix.otp, '25.1')) }}
+      - name: Run tests with coverage
+        run: MIX_ENV=test mix coveralls.github
+        if: ${{ contains(matrix.elixir, '1.14.0') && contains(matrix.otp, '25.1') }}
+      - name: Static code analysis
+        run: mix dialyzer
+        if: ${{ contains(matrix.elixir, '1.14.0') && contains(matrix.otp, '25.1') }}

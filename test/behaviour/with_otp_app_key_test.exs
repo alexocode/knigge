@@ -13,6 +13,33 @@ defmodule Behaviour.WithOtpAppKey do
                  end
   end
 
+  test "raises an ArgumentError with an invalid :config_key" do
+    Application.put_env(:knigge, :foo, SomeModule)
+
+    message = ~r/could not fetch .* :bar for application :knigge because .* :bar was not set/
+
+    assert_raise ArgumentError, message, fn ->
+      defmodule MissingConfig do
+        use Knigge,
+          otp_app: :knigge,
+          config_key: :bar
+      end
+    end
+  end
+
+  test "raises an ArgumentError with an invalid :config_key path" do
+    Application.put_env(:knigge, :foo, module: SomeModule)
+    message = ~r/could not fetch application environment \[:foo, :bar\] for application :knigge.*/
+
+    assert_raise ArgumentError, message, fn ->
+      defmodule MissingConfig do
+        use Knigge,
+          otp_app: :knigge,
+          config_key: [:foo, :bar]
+      end
+    end
+  end
+
   test "works fine with the relevant configuration being set in the Application environment" do
     Application.put_env(:knigge, :working_behaviour, SomeModule)
 
@@ -25,6 +52,22 @@ defmodule Behaviour.WithOtpAppKey do
       end
 
     Application.delete_env(:knigge, :working_behaviour)
+
+    assert behaviour.__knigge__(:implementation) == SomeModule
+  end
+
+  test "works fine with config_key path being set in the Application environment" do
+    Application.put_env(:knigge, :sys, module: SomeModule)
+
+    # Should not raise
+    behaviour =
+      defmodule_salted WorkingBehaviour do
+        use Knigge,
+          otp_app: :knigge,
+          config_key: [:sys, :module]
+      end
+
+    Application.delete_env(:knigge, :sys, module: SomeModule)
 
     assert behaviour.__knigge__(:implementation) == SomeModule
   end
@@ -54,6 +97,23 @@ defmodule Behaviour.WithOtpAppKey do
       end
 
     Application.delete_env(:knigge, :working_behaviour)
+
+    assert behaviour.__knigge__(:implementation) == SomeModule
+  end
+
+  test "ignores default if module is in config_key path" do
+    Application.put_env(:knigge, :sys, module: SomeModule)
+
+    # Should not raise
+    behaviour =
+      defmodule_salted WorkingBehaviour do
+        use Knigge,
+          otp_app: :knigge,
+          config_key: [:sys, :module],
+          default: AnotherModule
+      end
+
+    Application.delete_env(:knigge, :sys, module: SomeModule)
 
     assert behaviour.__knigge__(:implementation) == SomeModule
   end

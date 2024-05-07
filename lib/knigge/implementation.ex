@@ -9,15 +9,21 @@ defmodule Knigge.Implementation do
 
   alias Knigge.Options
 
-  def fetch!(%Options{implementation: {:config, otp_app, key}, default: default}) do
-    if is_nil(default) do
-      Application.fetch_env!(otp_app, key)
+  def fetch!(%Options{implementation: {:config, otp_app, [key | keys]}, default: default}) do
+    module = otp_app |> env!(key, default) |> get(keys)
+
+    if is_nil(module) do
+      raise ArgumentError,
+        message: """
+        could not fetch application environment #{inspect([key | keys])} \
+        for application #{inspect(otp_app)}\
+        """
     else
-      Application.get_env(otp_app, key, default)
+      module
     end
   end
 
-  def fetch!(%Options{implementation: implementation}) do
+  def fetch!(%Options{implementation: implementation}) when is_atom(implementation) do
     implementation
   end
 
@@ -26,4 +32,12 @@ defmodule Knigge.Implementation do
     |> Knigge.options!()
     |> Knigge.Implementation.fetch!()
   end
+
+  defp env!(otp_app, key, nil), do: Application.fetch_env!(otp_app, key)
+
+  defp env!(otp_app, key, default), do: Application.get_env(otp_app, key, default)
+
+  defp get(data, []), do: data
+
+  defp get(data, keys), do: get_in(data, keys)
 end

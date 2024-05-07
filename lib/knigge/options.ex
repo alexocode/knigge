@@ -54,9 +54,7 @@ defmodule Knigge.Options do
   - `[only: <envs>]` - equivalent to the option above
   - `[except: <envs>]` - only delegates at runtime if the current environment is __not__ contained in the list
 
-  __Default__: `Application.get_env(:knigge, :delegate_at_runtime?, #{
-    inspect(@defaults[:delegate_at_runtime?])
-  })`
+  __Default__: `Application.get_env(:knigge, :delegate_at_runtime?, #{inspect(@defaults[:delegate_at_runtime?])})`
 
   ### `do_not_delegate`
   A keyword list defining callbacks for which no delegation should happen.
@@ -156,9 +154,7 @@ defmodule Knigge.Options do
 
         message when is_binary(message) ->
           IO.warn(
-            "Knigge encountered the deprecated option `#{key}`, this option is no longer supported; #{
-              message
-            }."
+            "Knigge encountered the deprecated option `#{key}`, this option is no longer supported; #{message}."
           )
 
           nil
@@ -178,13 +174,7 @@ defmodule Knigge.Options do
 
   @doc """
   Applies the defaults to the given options:
-  #{
-    @defaults
-    |> Enum.map(fn {key, value} ->
-      "  - #{key} = #{inspect(value)}"
-    end)
-    |> Enum.join("\n")
-  }
+  #{@defaults |> Enum.map(fn {key, value} -> "  - #{key} = #{inspect(value)}" end) |> Enum.join("\n")}
   """
   @spec with_defaults(raw()) :: raw()
   def with_defaults(opts) do
@@ -192,7 +182,7 @@ defmodule Knigge.Options do
     |> Keyword.merge(defaults_from_config())
     |> Keyword.merge(opts)
     |> Keyword.put_new_lazy(:implementation, fn ->
-      {:config, opts[:otp_app], opts[:config_key]}
+      {:config, opts[:otp_app], List.wrap(opts[:config_key])}
     end)
   end
 
@@ -209,6 +199,8 @@ defmodule Knigge.Options do
   defp transform(key, envs, with_env: env)
        when key in [:delegate_at_runtime?, :warn],
        do: active_env?(env, envs)
+
+  defp transform(:config_key, value, with_env: _), do: List.wrap(value)
 
   defp transform(_key, value, with_env: _), do: value
 
@@ -317,7 +309,7 @@ defmodule Knigge.Options do
     do_not_delegate: :keyword,
     implementation: :module,
     otp_app: :atom,
-    config_key: :atom,
+    config_key: [:atom, {:list_of, :atom}],
     warn: :envs
   ]
 
@@ -331,11 +323,15 @@ defmodule Knigge.Options do
     |> valid_value?(value)
   end
 
+  defp valid_value?(types, value) when is_list(types),
+    do: Enum.any?(types, fn type -> valid_value?(type, value) end)
+
+  defp valid_value?({:list_of, type}, values),
+    do: is_list(values) && Enum.all?(values, fn value -> valid_value?(type, value) end)
+
   defp valid_value?(:atom, value), do: is_atom(value)
-  defp valid_value?(:boolean, value), do: is_boolean(value)
   defp valid_value?(:module, value), do: is_atom(value)
   defp valid_value?(:keyword, value), do: Keyword.keyword?(value)
-
   defp valid_value?(:envs, only: envs), do: valid_envs?(envs)
   defp valid_value?(:envs, except: envs), do: valid_envs?(envs)
   defp valid_value?(:envs, envs), do: valid_envs?(envs)
@@ -351,6 +347,11 @@ defmodule Knigge.Options do
 
       :keyword ->
         "keyword list"
+
+      # For now we explicitly match on the "or" option, as soon as we add further
+      # "or"ed options this ought to be refactored to something more general purpose
+      [:atom, {:list_of, :atom}] ->
+        "atom or list of atoms"
 
       other ->
         to_string(other)
