@@ -32,7 +32,7 @@ defmodule Knigge.OptionsTest do
              "Knigge encountered the deprecated option `delegate_at`, please use `delegate_at_runtime?`."
   end
 
-  test "rasies an exception for an invalid `default` value" do
+  test "raises an exception for an invalid `default` value" do
     message =
       "Knigge received invalid value for `default`. Expected module but received: \"invalid\""
 

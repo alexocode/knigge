@@ -23,7 +23,7 @@ Make sure to follow the following guidelines when doing so.
 * Write [good commit messages](https://chris.beams.io/posts/git-commit/).
 * Use the same coding conventions as the rest of the project.
 * Commit and push until you are happy with your contribution.
-* Make sure to add tests for it. So we can avoid that it breaks accidentially in the future.
+* Make sure to add tests for it. So we can avoid that it breaks accidentally in the future.
 * Add an entry to the [Changelog](./CHANGELOG.md) accordingly. See [changelog entry format](#changelog-entry-format).
 * Open a [pull request](https://help.github.com/articles/about-pull-requests) that relates to *only* one subject with a clear title
   and description in grammatically correct, complete sentences.

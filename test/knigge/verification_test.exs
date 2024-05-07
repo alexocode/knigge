@@ -13,7 +13,7 @@ defmodule Knigge.VerificationTest do
   defmodule FacadeWithoutImpl do
     use Knigge,
       implementation: Does.Not.Exist,
-      # Surpresses some warnings
+      # Suppresses some warnings
       delegate_at_runtime?: true
 
     @callback some_function() :: :ok
